@@ -1,4 +1,5 @@
 using Business;
+using Core.Exceptions;
 using Core.Utilities.Security;
 using Core.Utilities.Security.Encyrption;
 using Core.Utilities.Security.Jwt;
@@ -68,7 +69,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 if (app.Environment.IsProduction())
-    //app.ConfigureCustomExceptionMiddleware();
+    app.ConfigureCustomExceptionMiddleware();
 
 app.UseAuthentication();
 app.UseAuthorization();
