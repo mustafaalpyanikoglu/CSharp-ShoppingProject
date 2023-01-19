@@ -13,13 +13,19 @@ namespace DataAccess
         {
             services.AddDbContext<BaseDbContext>(options =>
             {
-                options.UseSqlServer(configuration.GetConnectionString("TestProjectConnectionString"));
+                options.UseSqlServer(configuration.GetConnectionString("ShoppingProjectConnectionString"));
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
 
             services.AddScoped<IUserDal, EfUserDal>();
             services.AddScoped<IOperationClaimDal, EfOperationClaimDal>();
             services.AddScoped<IUserOperationClaimDal, EfUserOperationClaimDal>();
+            services.AddScoped<IProductDal, EfProductDal>();
+            services.AddScoped<ICategoryDal, EfCategoryDal>();
+            services.AddScoped<IOrderDal, EfOrderDal>();
+            services.AddScoped<IPurseDal, EfPurseDal>();
+            services.AddScoped<IUserCartDal,EfUserCartDal>();
+
 
             return services;
         }

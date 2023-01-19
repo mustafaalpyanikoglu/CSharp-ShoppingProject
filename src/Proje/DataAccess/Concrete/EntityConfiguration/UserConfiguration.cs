@@ -13,7 +13,8 @@ namespace DataAccess.Concrete.EntityConfiguration
             builder.Property(u => u.Id).HasColumnName("Id").UseIdentityColumn(1, 1);
             builder.Property(u => u.FirstName).HasColumnName("FirstName").HasMaxLength(50).IsRequired();
             builder.Property(u => u.LastName).HasColumnName("LastName").HasMaxLength(50).IsRequired();
-            builder.Property(u => u.UserName).HasColumnName("UserName").HasMaxLength(50).IsRequired();
+            builder.Property(u => u.PhoneNumber).HasColumnName("PhoneNumber").HasMaxLength(50).IsRequired();
+            builder.Property(u => u.Address).HasColumnName("Address").HasMaxLength(50).IsRequired();
             builder.Property(u => u.Email).HasColumnName("Email").HasMaxLength(50);
             builder.Property(u => u.PasswordHash).HasColumnName("PasswordHash").HasColumnType("varbinary(500)").IsRequired();
             builder.Property(u => u.PasswordSalt).HasColumnName("PasswordSalt").HasColumnType("varbinary(500)").IsRequired();
@@ -21,6 +22,8 @@ namespace DataAccess.Concrete.EntityConfiguration
             builder.Property(u => u.Status).HasColumnName("Status").HasDefaultValue(true).IsRequired();
 
             builder.HasMany(u => u.UserOperationClaims).WithOne(u => u.User);
+            builder.HasMany(u => u.Purse).WithOne(u => u.User);
+            builder.HasMany(u => u.UserCart).WithOne(u => u.User);
             #endregion
         }
     }

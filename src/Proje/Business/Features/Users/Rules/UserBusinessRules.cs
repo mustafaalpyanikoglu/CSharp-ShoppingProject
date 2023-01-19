@@ -24,10 +24,10 @@ public class UserBusinessRules : BaseBusinessRules
         if (result == null) throw new BusinessException(UserNotFound);
     }
 
-    public async Task UserNameMustNotExist(string userName)
+    public async Task UserEmailMustNotExist(string email)
     {
-        User? result = await _userDal.GetAsync(t => t.UserName == userName);
-        if (result != null) throw new BusinessException(UserNameAvaliable);
+        User? result = await _userDal.GetAsync(t => t.Email == email);
+        if (result != null) throw new BusinessException(UserEmailAvaliable);
     }
 
     public async Task UserMustBeAvailable()
@@ -42,11 +42,11 @@ public class UserBusinessRules : BaseBusinessRules
         return new SuccessDataResult<User>(result);
     }
 
-    public async Task<IDataResult<User>> UserNameMustBePresent(string userName)
+    public async Task<IDataResult<User>> UserEmailMustBePresent(string email)
     {
-        User? result = await _userDal.GetAsync(b => b.UserName.ToLower() == userName.ToLower());
-        if (result == null) throw new BusinessException(UserNameNotAvaliable);
-        return new SuccessDataResult<User>(result, UserNameAvaliable);
+        User? result = await _userDal.GetAsync(b => b.Email.ToLower() == email.ToLower());
+        if (result == null) throw new BusinessException(UserEmailNotAvaliable);
+        return new SuccessDataResult<User>(result, UserEmailAvaliable);
     }
 
     public IDataResult<List<User>> MustBeARegisteredUser()
