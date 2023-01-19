@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Business.Features.Users.Models;
-using Core.Business.Pipelines.Authorization;
-using Core.Business.Requests;
-using Core.DataAccess.Paging;
+using Core.Application.Pipelines.Authorization;
+using Core.Application.Requests;
+using Core.Persistence.Paging;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using MediatR;

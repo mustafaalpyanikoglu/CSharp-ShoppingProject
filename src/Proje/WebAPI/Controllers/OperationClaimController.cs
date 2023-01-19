@@ -6,8 +6,8 @@ using Business.Features.OperationClaims.Models;
 using Business.Features.OperationClaims.Queries.GetByIdOperationClaim;
 using Business.Features.OperationClaims.Queries.GetListOperationClaim;
 using Business.Features.OperationClaims.Queries.GetListOperationClaimByDynamic;
-using Core.Business.Requests;
-using Core.DataAccess.Dynamic;
+using Core.Application.Requests;
+using Core.Persistence.Dynamic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
