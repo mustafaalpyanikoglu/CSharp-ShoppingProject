@@ -17,7 +17,8 @@ namespace DataAccess.Concrete.EntityConfiguration
 
             OperationClaim[] operationClaimSeeds =
             {
-                new(1, "admin","Bütün işlemleri yapabilir.")
+                new(1, "admin","Bütün işlemleri yapabilir."),
+                new(2, "customer","Alışveriş yapan müşteri")
             };
             builder.HasData(operationClaimSeeds);
         }
