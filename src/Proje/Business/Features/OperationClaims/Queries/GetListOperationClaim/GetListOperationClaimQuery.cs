@@ -21,18 +21,15 @@ namespace Business.Features.OperationClaims.Queries.GetListOperationClaim
         {
             private readonly IOperationClaimDal _operationClaimDal;
             private readonly IMapper _mapper;
-            private readonly OperationClaimBusinessRules _operationClaimBusinessRules;
 
-            public GetListOperationClaimQueryHanlder(IOperationClaimDal operationClaimDal, IMapper mapper, OperationClaimBusinessRules operationClaimBusinessRules)
+            public GetListOperationClaimQueryHanlder(IOperationClaimDal operationClaimDal, IMapper mapper)
             {
                 _operationClaimDal = operationClaimDal;
                 _mapper = mapper;
-                _operationClaimBusinessRules = operationClaimBusinessRules;
             }
 
             public async Task<OperationClaimListModel> Handle(GetListOperationClaimQuery request, CancellationToken cancellationToken)
             {
-                //await _operationClaimBusinessRules.OperationMustBeAvailable();
                 IPaginate<OperationClaim> operationClaims = await _operationClaimDal.GetListAsync(index: request.PageRequest.Page,
                                                                                                   size: request.PageRequest.PageSize);
                 OperationClaimListModel mappedOperationClaimListModel = _mapper.Map<OperationClaimListModel>(operationClaims);
