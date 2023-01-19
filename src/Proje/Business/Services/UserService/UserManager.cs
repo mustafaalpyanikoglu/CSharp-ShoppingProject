@@ -35,16 +35,11 @@ namespace Business.Services.UserService
             return new SuccessDataResult<List<OperationClaim>>(_userDal.GetClaims(userGetClaims.Data), UserMessages.UserRolesListed);
         }
 
-        public async Task<IDataResult<User>> GetUserByUserName(string userName)
+        public async Task<IDataResult<User>> GetUserByEmail(string email)
         {
-            IDataResult<User> userResult = await _userBusinessRules.UserNameMustBePresent(userName);
+            IDataResult<User> userResult = await _userBusinessRules.UserEmailMustBePresent(email);
             return new SuccessDataResult<User>(userResult.Data, userResult.Message);
         }
 
-        public async Task<IDataResult<User>> GetByUserName(string? userName)
-        {
-            User? user = await _userDal.GetAsync(u => u.UserName == userName);
-            return new SuccessDataResult<User>(user);
-        }
     }
 }

@@ -35,7 +35,7 @@ namespace Business.Services.AuthService
         {
             byte[] passwordHash, passwordSalt;
 
-            IDataResult<User>? userResult = await _userService.GetByUserName(userForChangePasswordDto.UserName);
+            IDataResult<User>? userResult = await _userService.GetUserByEmail(userForChangePasswordDto.Email);
 
             HashingHelper.CreatePasswordHash(userForChangePasswordDto.Password, out passwordHash, out passwordSalt);
             userResult.Data.PasswordHash = passwordHash;
@@ -64,7 +64,7 @@ namespace Business.Services.AuthService
 
         public async Task<IDataResult<User>> Login(UserForLoginDto userForLoginDto)
         {
-            IDataResult<User>? user = await _userService.GetByUserName(userForLoginDto.UserName);
+            IDataResult<User>? user = await _userService.GetUserByEmail(userForLoginDto.Email);
             await _authBusinessRules.UserShouldBeExists(user.Data);
             await _authBusinessRules.UserPasswordShouldBeMatch(user.Data.Id, userForLoginDto.Password);
 
@@ -81,7 +81,7 @@ namespace Business.Services.AuthService
 
         public async Task<IDataResult<User>> Register(UserForRegisterDto userForRegisterDto, string password)
         {
-            await _authBusinessRules.UserNameShouldBeNotExists(userForRegisterDto.UserName);
+            await _authBusinessRules.UserEmailShouldBeNotExists(userForRegisterDto.Email);
 
             byte[] passwordHash, passwordSalt;
             HashingHelper.CreatePasswordHash(password, out passwordHash, out passwordSalt);
@@ -89,7 +89,8 @@ namespace Business.Services.AuthService
             {
                 FirstName = userForRegisterDto.FirstName,
                 LastName = userForRegisterDto.LastName,
-                UserName = userForRegisterDto.UserName,
+                PhoneNumber = userForRegisterDto.PhoneNumber,
+                Address = userForRegisterDto.Address,
                 Email = userForRegisterDto.Email,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
@@ -103,12 +104,12 @@ namespace Business.Services.AuthService
 
         public async Task<IResult> UserExists(string userName)
         {
-            IDataResult<User> result = await _userService.GetByUserName(userName);
+            IDataResult<User> result = await _userService.GetUserByEmail(userName);
             if (result.Success)
             {
                 return new SuccessResult(UserAlreadyExists);
             }
-            return new ErrorResult(MailAvailable);
+            return new ErrorResult(UserEmailNotAvaliable);
         }
     }
 }
