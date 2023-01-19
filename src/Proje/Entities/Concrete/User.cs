@@ -1,4 +1,6 @@
-﻿namespace Entities.Concrete
+﻿using Core.Persistence.Repositories;
+
+namespace Entities.Concrete
 {
     public class User:Entity
     {

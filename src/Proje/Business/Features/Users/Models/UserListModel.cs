@@ -1,5 +1,5 @@
 ﻿using Business.Features.Users.Dtos;
-using Core.DataAccess.Paging;
+using Core.Persistence.Paging;
 
 namespace Business.Features.Users.Models
 {

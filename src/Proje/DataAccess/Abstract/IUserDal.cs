@@ -1,4 +1,4 @@
-﻿using Core.DataAccess.Repositories;
+﻿using Core.Persistence.Repositories;
 using Entities.Concrete;
 
 namespace DataAccess.Abstract

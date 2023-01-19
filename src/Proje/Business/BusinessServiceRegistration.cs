@@ -1,8 +1,8 @@
 ﻿using Business.Services.AuthService;
 using Business.Services.UserService;
-using Core.Business.Pipelines.Authorization;
-using Core.Business.Pipelines.Validation;
-using Core.Business.Rules;
+using Core.Application.Pipelines.Authorization;
+using Core.Application.Pipelines.Validation;
+using Core.Application.Rules;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,6 +1,6 @@
 ﻿using Business.Features.Auths.Dtos;
+using Core.Security.Jwt;
 using Core.Utilities.Abstract;
-using Core.Utilities.Security.Jwt;
 using Entities.Concrete;
 
 namespace Business.Services.AuthService

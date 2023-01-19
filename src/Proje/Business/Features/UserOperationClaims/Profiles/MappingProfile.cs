@@ -4,7 +4,7 @@ using Business.Features.UserOperationClaims.Commands.DeleteUserOperationClaim;
 using Business.Features.UserOperationClaims.Commands.UpdateUserOperationClaim;
 using Business.Features.UserOperationClaims.Dtos;
 using Business.Features.UserOperationClaims.Models;
-using Core.DataAccess.Paging;
+using Core.Persistence.Paging;
 using Entities.Concrete;
 
 namespace Business.Features.UserOperationClaims.Profiles

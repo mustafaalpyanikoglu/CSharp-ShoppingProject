@@ -2,7 +2,7 @@
 using Business.Features.Users.Dtos;
 using Business.Features.Users.Rules;
 using Business.Services.AuthService;
-using Core.Utilities.Security.Hashing;
+using Core.Security.Hashing;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using MediatR;

@@ -1,5 +1,4 @@
-﻿using Core.Helper.GuidHelpers;
-using Core.Utilities.Abstract;
+﻿using Core.Utilities.Abstract;
 using Core.Utilities.Business;
 using Core.Utilities.Concrete;
 using Microsoft.AspNetCore.Http;
@@ -44,7 +43,7 @@ namespace Core.Helper.FileHelpers
             {
                 return result;
             }
-            string fileName = GuidHelper.CreateGuid() + Path.GetExtension(file.FileName);
+            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
 
             CheckIfDirectoryExists(root);
             Console.WriteLine(root + fileName);

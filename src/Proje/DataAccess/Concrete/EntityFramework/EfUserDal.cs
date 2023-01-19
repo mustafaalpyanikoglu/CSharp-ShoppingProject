@@ -1,4 +1,4 @@
-﻿using Core.DataAccess.Repositories;
+﻿using Core.Persistence.Repositories;
 using DataAccess.Abstract;
 using DataAccess.Concrete.Contexts;
 using Entities.Concrete;

@@ -5,7 +5,7 @@ using Business.Features.Users.Command.UpdateUser;
 using Business.Features.Users.Command.UpdateUserFromAuth;
 using Business.Features.Users.Dtos;
 using Business.Features.Users.Models;
-using Core.DataAccess.Paging;
+using Core.Persistence.Paging;
 using Entities.Concrete;
 
 namespace Business.Features.Users.Profiles
