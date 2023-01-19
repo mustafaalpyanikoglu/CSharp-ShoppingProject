@@ -1,7 +1,7 @@
 ﻿using Business.Features.Auths.Dtos;
 using Business.Services.AuthService;
+using Core.Security.Jwt;
 using Core.Utilities.Abstract;
-using Core.Utilities.Security.Jwt;
 using Entities.Concrete;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

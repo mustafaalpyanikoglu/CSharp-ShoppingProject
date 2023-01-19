@@ -1,8 +1,8 @@
 using Business;
-using Core.Exceptions;
-using Core.Utilities.Security;
-using Core.Utilities.Security.Encyrption;
-using Core.Utilities.Security.Jwt;
+using Core.CrossCuttingConcerns.Exceptions;
+using Core.Security;
+using Core.Security.Hashing;
+using Core.Security.Jwt;
 using DataAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;

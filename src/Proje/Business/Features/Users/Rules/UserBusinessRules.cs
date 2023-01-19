@@ -1,12 +1,12 @@
 using Business.Features.Auths.Constants;
 using Business.Features.Users.Constants;
-using Core.Business.Rules;
-using Core.Exceptions;
 using Core.Utilities.Abstract;
 using Core.Utilities.Concrete;
-using Core.Utilities.Security.Hashing;
+using Core.Security.Hashing;
 using DataAccess.Abstract;
 using Entities.Concrete;
+using Core.Application.Rules;
+using Core.CrossCuttingConcerns.Exceptions;
 
 namespace Business.Features.Users.Rules;
 

@@ -1,4 +1,4 @@
-﻿using Core.Utilities.Security.Jwt;
+﻿using Core.Security.Jwt;
 
 namespace Business.Features.Users.Dtos
 {

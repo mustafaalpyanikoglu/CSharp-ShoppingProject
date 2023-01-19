@@ -5,11 +5,11 @@ using Business.Features.Users.Constants;
 using Business.Services.UserService;
 using Core.Utilities.Abstract;
 using Core.Utilities.Concrete;
-using Core.Utilities.Security.Hashing;
-using Core.Utilities.Security.Jwt;
+using Core.Security.Hashing;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using Microsoft.EntityFrameworkCore;
+using Core.Security.Jwt;
 
 namespace Business.Services.AuthService
 {

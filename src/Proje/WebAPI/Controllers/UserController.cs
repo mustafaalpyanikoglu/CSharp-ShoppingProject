@@ -7,8 +7,8 @@ using Business.Features.Users.Models;
 using Business.Features.Users.Queries.GetByIdUser;
 using Business.Features.Users.Queries.GetListUser;
 using Business.Features.Users.Queries.GetListUserByDynamic;
-using Core.Business.Requests;
-using Core.DataAccess.Dynamic;
+using Core.Application.Requests;
+using Core.Persistence.Dynamic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

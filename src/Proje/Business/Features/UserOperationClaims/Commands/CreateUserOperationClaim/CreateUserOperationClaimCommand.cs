@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Business.Features.UserOperationClaims.Dtos;
 using Business.Features.UserOperationClaims.Rules;
-using Core.Business.Pipelines.Authorization;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using MediatR;

@@ -1,8 +1,8 @@
 ﻿using Business.Features.OperationClaims.Constants;
 using Business.Features.UserOperationClaims.Constants;
 using Business.Features.Users.Constants;
-using Core.Business.Rules;
-using Core.Exceptions;
+using Core.Application.Rules;
+using Core.CrossCuttingConcerns.Exceptions;
 using Core.Utilities.Abstract;
 using Core.Utilities.Concrete;
 using DataAccess.Abstract;

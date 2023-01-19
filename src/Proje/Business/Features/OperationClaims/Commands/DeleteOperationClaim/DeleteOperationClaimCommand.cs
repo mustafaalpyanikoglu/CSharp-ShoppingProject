@@ -6,7 +6,7 @@ using MediatR;
 using Entities.Concrete;
 using static Business.Features.OperationClaims.Constants.OperationClaims;
 using static Entities.Constants.OperationClaims;
-using Core.Business.Pipelines.Authorization;
+using Core.Application.Pipelines.Authorization;
 
 namespace Business.Features.OperationClaims.Commands.DeleteOperationClaim
 {

@@ -1,7 +1,7 @@
 using Business.Features.Auths.Constants;
-using Core.Business.Rules;
-using Core.Exceptions;
-using Core.Utilities.Security.Hashing;
+using Core.Application.Rules;
+using Core.CrossCuttingConcerns.Exceptions;
+using Core.Security.Hashing;
 using DataAccess.Abstract;
 using Entities.Concrete;
 

@@ -1,4 +1,4 @@
-﻿using Core.Extensions.SecurityExtensions;
+﻿using Core.Security.SecurityExtensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
