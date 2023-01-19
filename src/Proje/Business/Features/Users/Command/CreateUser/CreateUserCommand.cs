@@ -15,7 +15,6 @@ namespace Business.Features.Users.Command.CreateUser
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string UserName { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
 
@@ -36,7 +35,7 @@ namespace Business.Features.Users.Command.CreateUser
 
             public async Task<CreatedUserDto> Handle(CreateUserCommand request, CancellationToken cancellationToken)
             {
-                await _userBusinessRules.UserNameMustNotExist(request.UserName);
+                await _userBusinessRules.UserEmailMustNotExist(request.Email);
 
                 User mappedUser = _mapper.Map<User>(request);
 

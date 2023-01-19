@@ -21,10 +21,10 @@ public class AuthBusinessRules : BaseBusinessRules
         return Task.CompletedTask;
     }
 
-    public async Task UserNameShouldBeNotExists(string userName)
+    public async Task UserEmailShouldBeNotExists(string email)
     {
-        User? user = await _userdal.GetAsync(u => u.UserName == userName);
-        if (user != null) throw new BusinessException(AuthMessages.UserNameAlreadyExists);
+        User? user = await _userdal.GetAsync(u => u.Email == email);
+        if (user != null) throw new BusinessException(AuthMessages.UserEmailAlreadyExists);
     }
 
     public async Task UserPasswordShouldBeMatch(int id, string password)
