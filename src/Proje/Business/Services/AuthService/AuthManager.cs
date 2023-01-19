@@ -1,7 +1,5 @@
 ﻿using Application.Features.Auths.Rules;
-using Business.Features.Auths.Constants;
 using Business.Features.Auths.Dtos;
-using Business.Features.Users.Constants;
 using Business.Services.UserService;
 using Core.Utilities.Abstract;
 using Core.Utilities.Concrete;
@@ -10,6 +8,8 @@ using DataAccess.Abstract;
 using Entities.Concrete;
 using Microsoft.EntityFrameworkCore;
 using Core.Security.Jwt;
+using static Business.Features.Auths.Constants.AuthMessages;
+using static Business.Features.Users.Constants.UserMessages;
 
 namespace Business.Services.AuthService
 {
@@ -42,7 +42,7 @@ namespace Business.Services.AuthService
             userResult.Data.PasswordSalt = passwordSalt;
             await _userDal.UpdateAsync(userResult.Data);
 
-            return new SuccessResult(AuthMessages.ChangePassword);
+            return new SuccessResult(PasswordChangedSuccessfully);
         }
 
         public async Task<AccessToken> CreateAccessToken(User user)
@@ -70,13 +70,13 @@ namespace Business.Services.AuthService
 
             if (user.Data == null)
             {
-                return new ErrorDataResult<User>(UserMessages.UserNotFound);
+                return new ErrorDataResult<User>(UserNotFound);
             }
             if (!HashingHelper.VerifyPasswordHash(userForLoginDto.Password ?? "", user.Data.PasswordHash, user.Data.PasswordSalt))
             {
-                return new ErrorDataResult<User>(user.Data, UserMessages.PasswordError);
+                return new ErrorDataResult<User>(user.Data, PasswordError);
             }
-            return new SuccessDataResult<User>(user.Data, UserMessages.SuccesfulLogin);
+            return new SuccessDataResult<User>(user.Data, SuccesfulLogin);
         }
 
         public async Task<IDataResult<User>> Register(UserForRegisterDto userForRegisterDto, string password)
@@ -98,7 +98,7 @@ namespace Business.Services.AuthService
             };
 
             await _userService.Add(user);
-            return new SuccessDataResult<User>(user, UserMessages.UserRegistered);
+            return new SuccessDataResult<User>(user, UserRegistered);
         }
 
         public async Task<IResult> UserExists(string userName)
@@ -106,9 +106,9 @@ namespace Business.Services.AuthService
             IDataResult<User> result = await _userService.GetByUserName(userName);
             if (result.Success)
             {
-                return new SuccessResult(UserMessages.UserAlreadyExists);
+                return new SuccessResult(UserAlreadyExists);
             }
-            return new ErrorResult(UserMessages.MailAvailable);
+            return new ErrorResult(MailAvailable);
         }
     }
 }

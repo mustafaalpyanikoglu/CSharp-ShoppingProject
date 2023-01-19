@@ -1,4 +1,5 @@
-﻿using Core.Utilities.Abstract;
+﻿using static Core.FileHelpers.FileMessages;
+using Core.Utilities.Abstract;
 using Core.Utilities.Business;
 using Core.Utilities.Concrete;
 using Microsoft.AspNetCore.Http;
@@ -58,14 +59,14 @@ namespace Core.Helper.FileHelpers
             {
                 return new SuccessResult();
             }
-            return new ErrorResult("Böyle bir dosya mevcut değil");
+            return new ErrorResult(FileNotFound);
         }
 
         private IResult CheckIfFileEnter(IFormFile file)
         {
             if (file.Length < 0)
             {
-                return new ErrorResult("Dosya girilmedi");
+                return new ErrorResult(FileNotEntered);
             }
             return new SuccessResult();
         }
@@ -76,7 +77,7 @@ namespace Core.Helper.FileHelpers
             {
                 return new SuccessResult();
             }
-            return new ErrorResult("Dosya uzantısı geçerli değil");
+            return new ErrorResult(FileExtensionIsNotValid);
         }
 
 
