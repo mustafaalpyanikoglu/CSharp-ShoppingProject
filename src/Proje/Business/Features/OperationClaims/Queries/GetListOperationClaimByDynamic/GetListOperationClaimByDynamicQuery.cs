@@ -36,8 +36,8 @@ namespace Business.Features.OperationClaims.Queries.GetListOperationClaimByDynam
                                       null,
                                       request.PageRequest.Page,
                                       request.PageRequest.PageSize);
-                OperationClaimListModel mappedCarListModel = _mapper.Map<OperationClaimListModel>(operationClaims);
-                return mappedCarListModel;
+                OperationClaimListModel mappedOperationClaimListModel = _mapper.Map<OperationClaimListModel>(operationClaims);
+                return mappedOperationClaimListModel;
             }
         }
     }
