@@ -16,16 +16,19 @@ namespace Business.Services.AuthService
     public class AuthManager : IAuthService
     {
         private readonly IUserService _userService;
+        private readonly IUserCartDal _userCartDal;
         private readonly IUserDal _userDal;
         private readonly IPurseDal _purseDal;
         private readonly ITokenHelper _tokenHelper;
         private readonly AuthBusinessRules _authBusinessRules;
         private readonly IUserOperationClaimDal _userOperationClaimDal;
 
-        public AuthManager(IUserService userService, IUserDal userDal, IPurseDal purseDal, 
-            ITokenHelper tokenHelper, AuthBusinessRules authBusinessRules, IUserOperationClaimDal userOperationClaimDal)
+        public AuthManager(IUserService userService, IUserCartDal userCartDal, IUserDal userDal, 
+            IPurseDal purseDal, ITokenHelper tokenHelper, AuthBusinessRules authBusinessRules, 
+            IUserOperationClaimDal userOperationClaimDal)
         {
             _userService = userService;
+            _userCartDal = userCartDal;
             _userDal = userDal;
             _purseDal = purseDal;
             _tokenHelper = tokenHelper;
@@ -113,6 +116,11 @@ namespace Business.Services.AuthService
             {
                 UserId = addRolToUser.Id,
                 Money = 10
+            });
+
+            await _userCartDal.AddAsync(new UserCart
+            {
+                UserId = addRolToUser.Id
             });
 
             return new SuccessDataResult<User>(user, UserRegistered);
