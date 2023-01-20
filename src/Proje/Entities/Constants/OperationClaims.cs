@@ -3,6 +3,6 @@
     public static class OperationClaims
     {
         public const string Admin = "admin";
-        public const string Customer = "musteri";
+        public const string Customer = "customer";
     }
 }

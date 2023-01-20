@@ -20,11 +20,22 @@ public class AuthBusinessRules : BaseBusinessRules
         if (user == null) throw new BusinessException(AuthMessages.UserDontExists);
         return Task.CompletedTask;
     }
+    public Task PasswordsEnteredMustBeTheSame(string newPassword, string repeatPassword)
+    {
+        if (newPassword != repeatPassword) throw new BusinessException(AuthMessages.PasswordDoNotMatch);
+        return Task.CompletedTask;
+    }
 
     public async Task UserEmailShouldBeNotExists(string email)
     {
         User? user = await _userdal.GetAsync(u => u.Email == email);
         if (user != null) throw new BusinessException(AuthMessages.UserEmailAlreadyExists);
+    }
+
+    public async Task UserEmailMustBeAvailable(string email)
+    {
+        User? user = await _userdal.GetAsync(u => u.Email == email);
+        if (user == null) throw new BusinessException(AuthMessages.UserDontExists);
     }
 
     public async Task UserPasswordShouldBeMatch(int id, string password)
