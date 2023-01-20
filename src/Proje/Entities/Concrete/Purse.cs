@@ -5,7 +5,7 @@ namespace Entities.Concrete
     public class Purse:Entity
     {
         public int UserId { get; set; }
-        public int Money { get; set; }
+        public float Money { get; set; }
 
         public virtual User User { get; set; }
 
@@ -14,7 +14,7 @@ namespace Entities.Concrete
 
         }
 
-        public Purse(int id, int userId, int money):this()
+        public Purse(int id, int userId, float money):this()
         {
             Id= id;
             UserId= userId;
