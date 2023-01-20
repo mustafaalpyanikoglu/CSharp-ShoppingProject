@@ -1,6 +1,7 @@
 ﻿using Business.Services.AuthService;
 using Business.Services.ProductService;
 using Business.Services.PurseService;
+using Business.Services.UserCartService;
 using Business.Services.UserService;
 using Core.Application.Pipelines.Authorization;
 using Core.Application.Pipelines.Validation;
@@ -24,6 +25,7 @@ namespace Business
             services.AddScoped<IAuthService, AuthManager>();
             services.AddScoped<IProductService, ProductManager>();
             services.AddScoped<IPurseService, PurseManager>();
+            services.AddScoped<IUserCartService, UserCartManager>();
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));

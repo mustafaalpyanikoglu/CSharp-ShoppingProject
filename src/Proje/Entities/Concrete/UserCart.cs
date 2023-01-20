@@ -9,6 +9,7 @@ namespace Entities.Concrete
         public virtual ICollection<Order> Orders { get; set; }
         public User User { get; set; }
 
+
         public UserCart()
         {
             Orders = new HashSet<Order>();

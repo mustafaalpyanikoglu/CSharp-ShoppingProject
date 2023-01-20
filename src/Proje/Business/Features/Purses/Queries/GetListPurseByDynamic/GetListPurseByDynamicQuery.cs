@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.Features.Purses.Models;
 using Business.Features.Purses.Queries.GetListPurseByDynamic;
+using Core.Application.Pipelines.Authorization;
 using Core.Application.Requests;
 using Core.Persistence.Dynamic;
 using Core.Persistence.Paging;
@@ -13,10 +14,12 @@ using static Entities.Constants.OperationClaims;
 
 namespace Business.Features.Purses.Queries.GetListPurseByDynamic
 {
-    public class GetListPurseByDynamicQuery : IRequest<PurseListModel>
+    public class GetListPurseByDynamicQuery : IRequest<PurseListModel>,ISecuredRequest
     {
         public PageRequest PageRequest { get; set; }
         public Dynamic Dynamic { get; set; }
+
+        public string[] Roles => new[] { Admin };
 
         public class GetListPurseByDynamicQueryHandler : IRequestHandler<GetListPurseByDynamicQuery, PurseListModel>
         {
