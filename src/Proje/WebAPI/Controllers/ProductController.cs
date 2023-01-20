@@ -6,6 +6,8 @@ using Business.Features.Products.Models;
 using Business.Features.Products.Queries.GetByIdProduct;
 using Business.Features.Products.Queries.GetListProduct;
 using Business.Features.Products.Queries.GetListProductByDynamic;
+using Business.Features.Products.Queries.GetListProductByName;
+using Business.Services.ProductService;
 using Core.Application.Requests;
 using Core.Persistence.Dynamic;
 using Microsoft.AspNetCore.Http;
@@ -17,6 +19,13 @@ namespace WebAPI.Controllers
     [ApiController]
     public class ProductController : BaseController
     {
+        private readonly IProductService _productService;
+
+        public ProductController(IProductService productService)
+        {
+            _productService = productService;
+        }
+
         [HttpPost("add")]
         public async Task<IActionResult> Add([FromBody] CreateProductCommand createProductCommand)
         {
@@ -54,6 +63,21 @@ namespace WebAPI.Controllers
         {
             GetListProductByDynamicQuery getListProductByDynamicQuery = new() { PageRequest = pageRequest, Dynamic = dynamic };
             ProductListModel result = await Mediator.Send(getListProductByDynamicQuery);
+            return Ok(result);
+        }
+        [HttpPost("GetList/ByName/ByDynamic")]
+        public async Task<IActionResult> GetListByName([FromQuery] PageRequest pageRequest,
+                                                      [FromBody] Dynamic? dynamic = null)
+        {
+            GetListProductByNameQuery getListProductByNameQuery = new() { PageRequest = pageRequest, Dynamic = dynamic };
+            ProductListByNameModel result = await Mediator.Send(getListProductByNameQuery);
+            return Ok(result);
+        }
+
+        [HttpPost("GetList/ByName2")]
+        public IActionResult GetListByName2([FromBody] string productName)
+        {
+            Task<ProductListByNameDto> result = _productService.GetListProductByName(productName);
             return Ok(result);
         }
     }
