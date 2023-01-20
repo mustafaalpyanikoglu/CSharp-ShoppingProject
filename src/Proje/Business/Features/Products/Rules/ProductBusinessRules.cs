@@ -40,11 +40,11 @@ namespace Business.Features.Products.Rules
             return new SuccessDataResult<List<Product>>(result, ProductMessages.ProductAvaliable);
         }
 
-        public async Task<IDataResult<Product>> ExistingDataShouldBeFetchedWhenTransactionRequestIdIsSelected(int id)
+        public async Task<Product> ExistingDataShouldBeFetchedWhenTransactionRequestIdIsSelected(int id)
         {
             Product? result = await _ProductDal.GetAsync(b => b.Id == id);
             if (result == null) throw new BusinessException(ProductMessages.ProductNotFound);
-            return new SuccessDataResult<Product>(result, ProductMessages.ProductAvaliable);
+            return result;
         }
     }
 }
