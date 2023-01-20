@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DataAccess.Migrations
 {
-    public partial class CreateDB : Migration
+    public partial class Create_DB : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -86,7 +86,7 @@ namespace DataAccess.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    Money = table.Column<int>(type: "int", nullable: false)
+                    Money = table.Column<float>(type: "real", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -180,6 +180,11 @@ namespace DataAccess.Migrations
                 table: "OperationClaims",
                 columns: new[] { "Id", "Description", "Name" },
                 values: new object[] { 1, "Bütün işlemleri yapabilir.", "admin" });
+
+            migrationBuilder.InsertData(
+                table: "OperationClaims",
+                columns: new[] { "Id", "Description", "Name" },
+                values: new object[] { 2, "Alışveriş yapan müşteri", "customer" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_ProductId",

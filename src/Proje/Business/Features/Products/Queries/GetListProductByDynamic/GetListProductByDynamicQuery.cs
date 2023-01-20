@@ -38,5 +38,4 @@ namespace Business.Features.Products.Queries.GetListProductByDynamic
             }
         }
     }
-
 }

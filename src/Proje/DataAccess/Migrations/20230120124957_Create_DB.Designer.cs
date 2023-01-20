@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20230119143939_CreateDB")]
-    partial class CreateDB
+    [Migration("20230120124957_Create_DB")]
+    partial class Create_DB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -75,6 +75,12 @@ namespace DataAccess.Migrations
                             Id = 1,
                             Description = "Bütün işlemleri yapabilir.",
                             Name = "admin"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Alışveriş yapan müşteri",
+                            Name = "customer"
                         });
                 });
 
@@ -173,8 +179,8 @@ namespace DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("Money")
-                        .HasColumnType("int")
+                    b.Property<float>("Money")
+                        .HasColumnType("real")
                         .HasColumnName("Money");
 
                     b.Property<int>("UserId")
