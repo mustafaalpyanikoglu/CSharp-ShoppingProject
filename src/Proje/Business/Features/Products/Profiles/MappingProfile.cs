@@ -23,7 +23,11 @@ namespace Business.Features.Products.Profiles
                                             .ReverseMap();
             CreateMap<Product, ProductListDto>().ForMember(x => x.CategoryName, opt => opt.MapFrom(x => x.Category.Name))
                                                 .ReverseMap();
+            CreateMap<Product, ProductListByNameDto>().ForMember(x => x.CategoryName, opt => opt.MapFrom(x => x.Category.Name))
+                                                .ReverseMap();
             CreateMap<IPaginate<Product>, ProductListModel>().ReverseMap();
+            CreateMap<IPaginate<Product>, ProductListByNameModel>().ReverseMap();
+
         }
     }
 }
