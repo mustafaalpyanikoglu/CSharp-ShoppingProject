@@ -13,5 +13,6 @@
         public const string UserEmailAlreadyExists = "User email already exists";
         public const string PasswordDontMatch = "Password don't match.";
         public const string PasswordChangedSuccessfully = "Şifre değiştirildi";
+        public const string PasswordDoNotMatch = "passwords do not match";
     }
 }
