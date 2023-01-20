@@ -14,7 +14,7 @@ using static Entities.Constants.OperationClaims;
 
 namespace Business.Features.Orders.Commands.CreateOrder
 {
-    public class CreateOrderCommand:IRequest<CreatedOrderDto>,ISecuredRequest
+    public class CreateOrderCommand:IRequest<CreatedOrderDto>//,ISecuredRequest
     {
         public int UserCartId { get; set; }
         public int ProductId { get; set; }
@@ -59,9 +59,6 @@ namespace Business.Features.Orders.Commands.CreateOrder
                 mappedOrder.TotalPrice = request.Quantity * product.Price;
 
                 Order createdOrder = await _orderDal.AddAsync(mappedOrder);
-
-                product.Quantity -= request.Quantity;
-                await _productDal.UpdateAsync(product);
 
                 CreatedOrderDto createOrderDto = _mapper.Map<CreatedOrderDto>(createdOrder);
 

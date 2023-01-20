@@ -3,6 +3,7 @@ using Business.Features.Orders.Commands.ConfirmOrder;
 using Business.Features.Orders.Commands.CreateOrder;
 using Business.Features.Orders.Commands.DeleteOrder;
 using Business.Features.Orders.Commands.UpdateOrder;
+using Business.Features.Orders.Commands.UpdateProductQuantityInOrder;
 using Business.Features.Orders.Dtos;
 using Business.Features.Orders.Models;
 using Core.Persistence.Paging;
@@ -22,6 +23,7 @@ namespace Business.Features.Orders.Profiles
                                                .ForMember(x => x.ProductPrice, opt => opt.MapFrom(x => x.Product.Price))
                                                .ForMember(x => x.ProductPrice, opt => opt.MapFrom(x => x.Product.Price))
                                                .ReverseMap();
+            CreateMap<Order, UpdateProductQuantityInOrderDto>().ReverseMap();
             CreateMap<Order, CreatedOrderDto>().ReverseMap();
             CreateMap<Order, DeletedOrderDto>().ReverseMap();
             CreateMap<Order, UpdatedOrderDto>().ReverseMap();

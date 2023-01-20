@@ -11,7 +11,7 @@ using static Entities.Constants.OperationClaims;
 
 namespace Business.Features.Orders.Commands.ConfirmOrder
 {
-    public class ConfirmOrderCommand:IRequest<ConfirmOrderDto>,ISecuredRequest
+    public class ConfirmOrderCommand:IRequest<ConfirmOrderDto>//,ISecuredRequest
     {
         public int OrderId { get; set; }
 
@@ -50,7 +50,13 @@ namespace Business.Features.Orders.Commands.ConfirmOrder
                 Product? product = await _productDal.GetAsync(p=> p.Id == order.ProductId);
                 Purse? purse = await _purseDal.GetAsync(p => p.UserId == userCart.UserId);
 
-                await _purseService.SpendMoney(purse,order.TotalPrice);
+                
+                await _purseService.SpendMoney(purse,order.TotalPrice); //Kullanıcının yeterli parası varsa parası azalır
+
+
+                product.Quantity -= order.Quantity; //stokda ki ürün miktarı azalır
+                await _productDal.UpdateAsync(product);
+
 
                 order.Status = true;
                 order.ApprovalDate = Convert.ToDateTime(DateTime.Now.ToString("F"));
@@ -61,10 +67,10 @@ namespace Business.Features.Orders.Commands.ConfirmOrder
                 order.TotalPrice = order.TotalPrice;
                 order.Quantity = order.Quantity;
 
-                Order updatedOrder = await _orderDal.UpdateAsync(order);
+                Order updatedOrder = await _orderDal.UpdateAsync(order); //sipariş durumu onaylanır
                 ConfirmOrderDto confirmOrderDto = _mapper.Map<ConfirmOrderDto>(updatedOrder);
 
-                confirmOrderDto.ProductName = product.Name;
+                confirmOrderDto.ProductName = product.Name; //kullanıcının aldığı ürünleri görmesi için
                 confirmOrderDto.ProductPrice = product.Price;
 
                 return confirmOrderDto;

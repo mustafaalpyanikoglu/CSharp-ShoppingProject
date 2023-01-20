@@ -14,7 +14,7 @@ using static Entities.Constants.OperationClaims;
 
 namespace Business.Features.Orders.Commands.UpdateOrder
 {
-    public class UpdateOrderCommand : IRequest<UpdatedOrderDto>, ISecuredRequest
+    public class UpdateOrderCommand : IRequest<UpdatedOrderDto>//, ISecuredRequest
     {
         public int Id { get; set; }
         public int UserCartId { get; set; }
