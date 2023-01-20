@@ -1,4 +1,5 @@
 ﻿using Business.Services.AuthService;
+using Business.Services.OrderService;
 using Business.Services.ProductService;
 using Business.Services.PurseService;
 using Business.Services.UserCartService;
@@ -26,6 +27,7 @@ namespace Business
             services.AddScoped<IProductService, ProductManager>();
             services.AddScoped<IPurseService, PurseManager>();
             services.AddScoped<IUserCartService, UserCartManager>();
+            services.AddScoped<IOrderService, OrderManager>();
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
