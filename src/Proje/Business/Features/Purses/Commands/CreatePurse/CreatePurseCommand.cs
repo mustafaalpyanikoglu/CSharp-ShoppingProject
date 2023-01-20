@@ -5,9 +5,9 @@ using Core.Application.Pipelines.Authorization;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using MediatR;
+using Business.Features.Users.Rules;
 using static Business.Features.Purses.Constants.OperationClaims;
 using static Entities.Constants.OperationClaims;
-using Business.Features.Users.Rules;
 
 namespace Business.Features.Purses.Commands.CreatePurse
 {
