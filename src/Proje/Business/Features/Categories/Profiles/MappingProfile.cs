@@ -22,6 +22,8 @@ namespace Business.Features.Categorys.Profiles
             CreateMap<Category, CategoryDto>().ReverseMap();
             CreateMap<Category, CategoryListDto>().ReverseMap();
             CreateMap<IPaginate<Category>, CategoryListModel>().ReverseMap();
+            CreateMap<Category, CategoryListByNameDto>().ReverseMap();
+            CreateMap<IPaginate<Category>, CategoryListByNameModel>().ReverseMap();
         }
     }
 }

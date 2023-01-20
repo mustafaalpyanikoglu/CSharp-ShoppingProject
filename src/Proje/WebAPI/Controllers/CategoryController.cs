@@ -5,6 +5,7 @@ using Business.Features.Categories.Dtos;
 using Business.Features.Categories.Queries.GetByIdCategory;
 using Business.Features.Categories.Queries.GetListCategory;
 using Business.Features.Categories.Queries.GetListCategoryByDynamic;
+using Business.Features.Categories.Queries.GetListCategoryByName;
 using Business.Features.Products.Models;
 using Core.Application.Requests;
 using Core.Persistence.Dynamic;
@@ -54,6 +55,14 @@ namespace WebAPI.Controllers
         {
             GetListCategoryByDynamicQuery getListCategoryByDynamicQuery = new() { PageRequest = pageRequest, Dynamic = dynamic };
             CategoryListModel result = await Mediator.Send(getListCategoryByDynamicQuery);
+            return Ok(result);
+        }
+        [HttpPost("GetList/ByName/ByDynamic")]
+        public async Task<IActionResult> GetListByNameByDynamic([FromQuery] PageRequest pageRequest,
+                                                      [FromBody] Dynamic? dynamic = null)
+        {
+            GetListCategoryByNameQuery getListCategoryByNameQuery = new() { PageRequest = pageRequest, Dynamic = dynamic };
+            CategoryListByNameModel result = await Mediator.Send(getListCategoryByNameQuery);
             return Ok(result);
         }
     }
