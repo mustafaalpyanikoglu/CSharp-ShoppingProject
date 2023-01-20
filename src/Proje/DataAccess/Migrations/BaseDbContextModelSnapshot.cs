@@ -177,8 +177,8 @@ namespace DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("Money")
-                        .HasColumnType("int")
+                    b.Property<float>("Money")
+                        .HasColumnType("real")
                         .HasColumnName("Money");
 
                     b.Property<int>("UserId")
