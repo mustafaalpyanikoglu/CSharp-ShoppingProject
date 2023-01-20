@@ -1,0 +1,65 @@
+﻿using static Business.Features.Orders.Constants.OrderMessages;
+using Core.Application.Rules;
+using Core.CrossCuttingConcerns.Exceptions;
+using Core.Utilities.Abstract;
+using Core.Utilities.Concrete;
+using DataAccess.Abstract;
+using Entities.Concrete;
+
+namespace Business.Features.Orders.Rules
+{
+    public class OrderBusinessRules:BaseBusinessRules
+    {
+        private readonly IOrderDal _orderDal;
+        private readonly IProductDal _productDal;
+
+        public OrderBusinessRules(IOrderDal orderDal, IProductDal productDal)
+        {
+            _orderDal = orderDal;
+            _productDal = productDal;
+        }
+
+        public async Task OrderIdShouldExistWhenSelected(int? id)
+        {
+            Order? result = await _orderDal.GetAsync(b => b.Id == id);
+            if (result ==null) throw new BusinessException(OrderNotFound);
+        }
+
+        public Task OrderStatusMustBeFalse(bool status)
+        {
+            if (status == true) throw new BusinessException(OrderHasAlreadyBeenConfirmed);
+            return Task.CompletedTask;
+        }
+
+        public async Task TheNumberOfProductsOrderedShouldNotBeMoreThanStock(int productId,int quantity)
+        {
+            Product? product = await _productDal.GetAsync(p => p.Id == productId);
+            if (product.Quantity < quantity) throw new BusinessException(RequestedProductQuantityIsNotInStock);
+        }
+        public async Task OrderNumberMustBeUnique(string orderNumber)
+        {
+            Order? result = await _orderDal.GetAsync(p => p.OrderNumber == orderNumber);
+            if (result != null) throw new BusinessException(OrderNumberIsNotUnique);
+        }
+
+        public async Task OperationMustBeAvailable()
+        {
+            List<Order>? results = _orderDal.GetAll();
+            if (results.Count <= 0) throw new BusinessException(OrderNotFound);
+        }
+        public IDataResult<List<Order>> MustBeARegisteredOrder()
+        {
+            List<Order>? result = _orderDal.GetAll();
+            if (result.Count <= 0) throw new BusinessException(OrderNotFound);
+            return new SuccessDataResult<List<Order>>(result, OrderAvaliable);
+        }
+
+        public async Task<Order> ExistingDataShouldBeFetchedWhenTransactionRequestIdIsSelected(int id)
+        {
+            Order? result = await _orderDal.GetAsync(b => b.Id == id);
+            if (result == null) throw new BusinessException(OrderNotFound);
+            return result;
+        }
+
+    }
+}
