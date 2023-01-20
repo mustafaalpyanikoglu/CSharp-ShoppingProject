@@ -17,15 +17,17 @@ namespace Business.Services.AuthService
     {
         private readonly IUserService _userService;
         private readonly IUserDal _userDal;
+        private readonly IPurseDal _purseDal;
         private readonly ITokenHelper _tokenHelper;
         private readonly AuthBusinessRules _authBusinessRules;
         private readonly IUserOperationClaimDal _userOperationClaimDal;
 
-        public AuthManager(IUserService userService, IUserDal userDal, ITokenHelper tokenHelper, 
-            AuthBusinessRules authBusinessRules, IUserOperationClaimDal userOperationClaimDal)
+        public AuthManager(IUserService userService, IUserDal userDal, IPurseDal purseDal, 
+            ITokenHelper tokenHelper, AuthBusinessRules authBusinessRules, IUserOperationClaimDal userOperationClaimDal)
         {
             _userService = userService;
             _userDal = userDal;
+            _purseDal = purseDal;
             _tokenHelper = tokenHelper;
             _authBusinessRules = authBusinessRules;
             _userOperationClaimDal = userOperationClaimDal;
@@ -105,6 +107,12 @@ namespace Business.Services.AuthService
             {
                 UserId = addRolToUser.Id,
                 OperationClaimId = 2
+            });
+
+            await _purseDal.AddAsync(new Purse
+            {
+                UserId = addRolToUser.Id,
+                Money = 10
             });
 
             return new SuccessDataResult<User>(user, UserRegistered);

@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
-using Business.Features.Categorys.Rules;
-using Business.Features.Purses.Dtos;
-using Business.Features.Purses.Rules;
 using Business.Features.Purses.Dtos;
 using Business.Features.Purses.Rules;
 using Core.Application.Pipelines.Authorization;
 using DataAccess.Abstract;
-using DataAccess.Concrete.EntityFramework;
 using Entities.Concrete;
 using MediatR;
 using static Business.Features.Purses.Constants.OperationClaims;
