@@ -1,4 +1,7 @@
-﻿using Business.Features.Auths.Dtos;
+﻿using Business.Features.Auths.Commands.ChangePassword;
+using Business.Features.Auths.Dtos;
+using Business.Features.Categories.Commands.CreateCategory;
+using Business.Features.Categories.Dtos;
 using Business.Services.AuthService;
 using Core.Security.Jwt;
 using Core.Utilities.Abstract;
@@ -38,14 +41,10 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
         [HttpPost("changepassword")]
-        public async Task<ActionResult> ChangePassword([FromBody] UserForChangePasswordDto userForChangePasswordDto)
+        public async Task<IActionResult> Add([FromBody] ChangePasswordCommand changePasswordCommand)
         {
-            var result = await _authService.ChangePassword(userForChangePasswordDto);  //istisna bir durum var kullanmak çok yanlış ama IResult yaptığımda kabul etmedi
-            if (result.Success)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
+            UserForChangePasswordDto result = await Mediator.Send(changePasswordCommand);
+            return Ok(result);
         }
     }
 }

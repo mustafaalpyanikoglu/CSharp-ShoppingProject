@@ -99,6 +99,14 @@ namespace Business.Services.AuthService
             };
 
             await _userService.Add(user);
+
+            User? addRolToUser = await _userDal.GetAsync(u => u.Email == user.Email);
+            await _userOperationClaimDal.AddAsync(new UserOperationClaim
+            {
+                UserId = addRolToUser.Id,
+                OperationClaimId = 2
+            });
+
             return new SuccessDataResult<User>(user, UserRegistered);
         }
 
