@@ -22,6 +22,11 @@ namespace Business.Features.Orders.Rules
             Order? result = await _orderDal.GetAsync(b => b.Id == id);
             if (result ==null) throw new BusinessException(OrderNotFound);
         }
+        public async Task OrderNumberShouldExistWhenSelected(string? orderNumber)
+        {
+            Order? result = await _orderDal.GetAsync(b => b.OrderNumber == orderNumber);
+            if (result == null) throw new BusinessException(OrderNotFound);
+        }
 
         public Task OrderStatusMustBeFalse(bool status)
         {

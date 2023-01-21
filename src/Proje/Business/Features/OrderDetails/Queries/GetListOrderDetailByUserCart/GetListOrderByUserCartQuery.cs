@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using Business.Features.OrderDetails.Models;
+using Business.Features.OrderDetails.Rules;
 using Business.Features.UserCarts.Rules;
+using Business.Features.Users.Rules;
+using Business.Services.OrderDetailService;
 using Core.Application.Pipelines.Authorization;
 using Core.Application.Requests;
 using Core.Persistence.Paging;
@@ -8,7 +11,6 @@ using DataAccess.Abstract;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Xml.Linq;
 using static Business.Features.OrderDetails.Constants.OperationClaims;
 using static Entities.Constants.OperationClaims;
 
@@ -16,7 +18,7 @@ namespace Business.Features.OrderDetailDetails.Queries.GetListOrderDetailDetailB
 {
     public class GetListOrderDetailByUserCartQuery : IRequest<OrderDetailListByUserCartModel>,ISecuredRequest
     {
-        public int UserCartId { get; set; }
+        public int UserId { get; set; }
         public PageRequest PageRequest { get; set; }
 
         public string[] Roles => new[] { Admin, Customer };
@@ -25,21 +27,33 @@ namespace Business.Features.OrderDetailDetails.Queries.GetListOrderDetailDetailB
         {
             private readonly IMapper _mapper;
             private readonly IOrderDetailDal _orderDetailDal;
-            private readonly UserCartBusinessRules _userCartBusinessRules;
+            private readonly IOrderDetailService _orderDetailService;
+            private readonly UserBusinessRules _userBusinessRules;
+            private readonly OrderDetailBusinessRules _orderDetailBusinessRules;
 
-            public GetListOrderDetailByUserCartQueryHandler(IMapper mapper, IOrderDetailDal orderDetailDal, UserCartBusinessRules userCartBusinessRules)
+            public GetListOrderDetailByUserCartQueryHandler(IMapper mapper, IOrderDetailDal orderDetailDal, IOrderDetailService orderDetailService, UserBusinessRules userBusinessRules, OrderDetailBusinessRules orderDetailBusinessRules)
             {
                 _mapper = mapper;
                 _orderDetailDal = orderDetailDal;
-                _userCartBusinessRules = userCartBusinessRules;
+                _orderDetailService = orderDetailService;
+                _userBusinessRules = userBusinessRules;
+                _orderDetailBusinessRules = orderDetailBusinessRules;
             }
 
             public async Task<OrderDetailListByUserCartModel> Handle(GetListOrderDetailByUserCartQuery request, CancellationToken cancellationToken)
             {
-                await _userCartBusinessRules.UserCartIdShouldExistWhenSelected(request.UserCartId);
+                await _userBusinessRules.UserIdMustBeAvailable(request.UserId);
+                
+                OrderDetail? orderDetail = await _orderDetailDal.GetAsync(o => o.Order.UserCart.UserId == request.UserId && o.Order.Status == false, include: c => c.Include(c => c.Order));
+
+                await _orderDetailBusinessRules.IsOrderDetailNull(orderDetail);
+
+                await _orderDetailBusinessRules.OrderDetailIdShouldExistWhenSelected(orderDetail.Id);
+
+                float totalPrice = await _orderDetailService.AmountUserCart(orderDetail.OrderId);
 
                 IPaginate<OrderDetail> OrderDetails = await _orderDetailDal.GetListAsync(
-                    o => o.Order.UserCartId == request.UserCartId && o.Order.Status == false,
+                    o => o.Order.UserCart.UserId == request.UserId && o.Order.Status == false,
                     include: c => c.Include(c => c.Product)
                                    .Include(c => c.Product.Category)
                                    .Include(c => c.Order)
@@ -48,6 +62,7 @@ namespace Business.Features.OrderDetailDetails.Queries.GetListOrderDetailDetailB
                     index: request.PageRequest.Page,
                     size: request.PageRequest.PageSize);
                 OrderDetailListByUserCartModel mappedGetListOrderDetailByUserCartDto = _mapper.Map<OrderDetailListByUserCartModel>(OrderDetails);
+                mappedGetListOrderDetailByUserCartDto.AmountOfPayment = totalPrice;
                 return mappedGetListOrderDetailByUserCartDto;
             }
         }
