@@ -24,6 +24,11 @@ namespace Business.Features.OrderDetails.Rules
             OrderDetail? result = await _OrderDetailDal.GetAsync(b => b.Id == id);
             if (result ==null) throw new BusinessException(OrderDetailNotFound);
         }
+        public Task IsOrderDetailNull(OrderDetail orderDetail)
+        {
+            if (orderDetail == null) throw new BusinessException(OrderDetailNotFound);
+            return Task.CompletedTask;
+        }
         public async Task ThereShouldBeNoItemsInTheCart(int orderId)
         {
             OrderDetail? result = await _OrderDetailDal.GetAsync(b => b.OrderId == orderId);

@@ -44,11 +44,10 @@ namespace WebAPI.Controllers
             OrderDetailListModel result = await Mediator.Send(getListOrderDetailQuery);
             return Ok(result);
         }
-
-        [HttpGet("GetList/ByUserCartId/{userCartId}")]
-        public async Task<IActionResult> GetListOrderByUserCart([FromRoute] int userCartId, [FromQuery] PageRequest pageRequest)
+        [HttpGet("GetList/UserId/{userId}")]
+        public async Task<IActionResult> GetListOrderByUserCart([FromRoute] int userId, [FromQuery] PageRequest pageRequest)
         {
-            GetListOrderDetailByUserCartQuery getListOrderByUserCartQuery = new() { UserCartId = userCartId, PageRequest = pageRequest };
+            GetListOrderDetailByUserCartQuery getListOrderByUserCartQuery = new() { UserId = userId, PageRequest = pageRequest };
             OrderDetailListByUserCartModel result = await Mediator.Send(getListOrderByUserCartQuery);
             return Ok(result);
         }
@@ -56,7 +55,14 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetListPastOrder([FromRoute] int userId, [FromQuery] PageRequest pageRequest)
         {
             GetListPastOrderDetailQuery getListPastOrderQuery = new() { UserId = userId, PageRequest = pageRequest };
-            OrderDetailListByUserCartModel result = await Mediator.Send(getListPastOrderQuery);
+            UserPastOrderListModel result = await Mediator.Send(getListPastOrderQuery);
+            return Ok(result);
+        }
+        [HttpGet("GetBy/OrderNumberOrderDetail/{orderNumber}")]
+        public async Task<IActionResult> GetListOrderDetailByOrderName([FromRoute] string orderNumber, [FromQuery] PageRequest pageRequest)
+        {
+            GetListOrderDetailByOrderNameQuery getListOrderDetailByOrderNameQuery = new() { OrderNumber = orderNumber, PageRequest = pageRequest };
+            OrderDetailListByUserCartModel result = await Mediator.Send(getListOrderDetailByOrderNameQuery);
             return Ok(result);
         }
         [HttpGet("{Id}")]

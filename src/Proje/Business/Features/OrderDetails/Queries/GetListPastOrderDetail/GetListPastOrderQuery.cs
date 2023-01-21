@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Business.Features.OrderDetails.Models;
+using Business.Features.OrderDetails.Rules;
 using Business.Features.Users.Rules;
+using Business.Services.OrderDetailService;
 using Core.Application.Pipelines.Authorization;
 using Core.Application.Requests;
 using Core.Persistence.Paging;
@@ -13,31 +15,40 @@ using static Entities.Constants.OperationClaims;
 
 namespace Business.Features.OrderDetailDetails.Queries.GetListPastOrderDetailDetail
 {
-    public class GetListPastOrderDetailQuery : IRequest<OrderDetailListByUserCartModel>, ISecuredRequest
+    public class GetListPastOrderDetailQuery : IRequest<UserPastOrderListModel>, ISecuredRequest
     {
         public int UserId { get; set; }
         public PageRequest PageRequest { get; set; }
 
         public string[] Roles => new[] { Admin, Customer };
 
-        public class GetListPastOrderDetailQueryHandler : IRequestHandler<GetListPastOrderDetailQuery, OrderDetailListByUserCartModel>
+        public class GetListPastOrderDetailQueryHandler : IRequestHandler<GetListPastOrderDetailQuery, UserPastOrderListModel>
         {
             private readonly IMapper _mapper;
-            private readonly IOrderDetailDal _OrderDetailDal;
+            private readonly IOrderDetailDal _orderDetailDal;
+            private readonly IOrderDetailService _orderDetailService;
             private readonly UserBusinessRules _userBusinessRules;
+            private readonly OrderDetailBusinessRules _orderDetailBusinessRules;
 
-            public GetListPastOrderDetailQueryHandler(IMapper mapper, IOrderDetailDal OrderDetailDal, UserBusinessRules userBusinessRules)
+            public GetListPastOrderDetailQueryHandler(IMapper mapper, IOrderDetailDal orderDetailDal, IOrderDetailService orderDetailService, UserBusinessRules userBusinessRules, OrderDetailBusinessRules orderDetailBusinessRules)
             {
                 _mapper = mapper;
-                _OrderDetailDal = OrderDetailDal;
+                _orderDetailDal = orderDetailDal;
+                _orderDetailService = orderDetailService;
                 _userBusinessRules = userBusinessRules;
+                _orderDetailBusinessRules = orderDetailBusinessRules;
             }
 
-            public async Task<OrderDetailListByUserCartModel> Handle(GetListPastOrderDetailQuery request, CancellationToken cancellationToken)
+            public async Task<UserPastOrderListModel> Handle(GetListPastOrderDetailQuery request, CancellationToken cancellationToken)
             {
                 await _userBusinessRules.UserIdMustBeAvailable(request.UserId);
 
-                IPaginate<OrderDetail> OrderDetails = await _OrderDetailDal.GetListAsync(
+                OrderDetail? orderDetail = await _orderDetailDal.GetAsync(o => o.Order.UserCart.UserId == request.UserId, include: c => c.Include(c => c.Order));
+                await _orderDetailBusinessRules.OrderDetailIdShouldExistWhenSelected(orderDetail.Id);
+
+                float totalPrice = await _orderDetailService.AmountUserCart(orderDetail.OrderId);
+
+                IPaginate<OrderDetail> OrderDetails = await _orderDetailDal.GetListAsync(
                     o => o.Order.Status == true && o.Order.UserCart.User.Id == request.UserId,
                     include: c => c.Include(c => c.Product)
                                    .Include(c => c.Product.Category)
@@ -46,7 +57,8 @@ namespace Business.Features.OrderDetailDetails.Queries.GetListPastOrderDetailDet
                                    .Include(c => c.Order.UserCart.User),
                     index: request.PageRequest.Page,
                     size: request.PageRequest.PageSize);
-                OrderDetailListByUserCartModel mappedGetListOrderDetailByUserCartDto = _mapper.Map<OrderDetailListByUserCartModel>(OrderDetails);
+                UserPastOrderListModel mappedGetListOrderDetailByUserCartDto = _mapper.Map<UserPastOrderListModel>(OrderDetails);
+                mappedGetListOrderDetailByUserCartDto.AmountOfPayment = totalPrice;
                 return mappedGetListOrderDetailByUserCartDto;
             }
         }
