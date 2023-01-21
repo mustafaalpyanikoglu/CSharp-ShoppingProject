@@ -14,7 +14,7 @@ using static Entities.Constants.OperationClaims;
 
 namespace Business.Features.Orders.Queries.GetListOrder
 {
-    public class GetListOrderQuery : IRequest<OrderListModel>//, ISecuredRequest
+    public class GetListOrderQuery : IRequest<OrderListModel>, ISecuredRequest
     {
         public PageRequest PageRequest { get; set; }
         public string[] Roles => new[] { Admin, OrderGet };

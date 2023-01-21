@@ -14,7 +14,7 @@ using static Entities.Constants.OperationClaims;
 
 namespace Business.Features.Orders.Queries.GetListOrderByDynamic
 {
-    public class GetListOrderByDynamicQuery:IRequest<OrderListModel>//, ISecuredRequest
+    public class GetListOrderByDynamicQuery:IRequest<OrderListModel>, ISecuredRequest
     {
         public PageRequest PageRequest { get; set; }
         public Dynamic Dynamic { get; set; }

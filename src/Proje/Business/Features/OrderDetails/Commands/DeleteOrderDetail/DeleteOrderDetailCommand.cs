@@ -14,7 +14,7 @@ namespace Business.Features.OrderDetails.Commands.DeleteOrder
     {
         public int Id { get; set; }
 
-        public string[] Roles => new[] { Admin, OrderDetailDelete };
+        public string[] Roles => new[] { Admin, OrderDetailDelete, Customer };
 
         public class DeleteOrderDetailCommandHandler : IRequestHandler<DeleteOrderDetailCommand, DeletedOrderDetailDto>
         {

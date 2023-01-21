@@ -15,7 +15,7 @@ namespace Business.Features.Purses.Queries.GetByIdPurse
     {
         public int Id { get; set; }
 
-        public string[] Roles => new[] { Admin, Customer };
+        public string[] Roles => new[] { Admin };
 
         public class GetByIdPurseQueryHandler : IRequestHandler<GetByIdPurseQuery, PurseDto>
         {
