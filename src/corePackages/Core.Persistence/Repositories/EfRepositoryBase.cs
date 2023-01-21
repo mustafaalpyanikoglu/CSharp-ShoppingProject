@@ -2,6 +2,7 @@
 using Core.Persistence.Paging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using System.Drawing;
 using System.Linq.Expressions;
 namespace Core.Persistence.Repositories
 {
