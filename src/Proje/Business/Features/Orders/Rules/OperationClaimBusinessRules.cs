@@ -11,12 +11,10 @@ namespace Business.Features.Orders.Rules
     public class OrderBusinessRules:BaseBusinessRules
     {
         private readonly IOrderDal _orderDal;
-        private readonly IProductDal _productDal;
 
-        public OrderBusinessRules(IOrderDal orderDal, IProductDal productDal)
+        public OrderBusinessRules(IOrderDal orderDal)
         {
             _orderDal = orderDal;
-            _productDal = productDal;
         }
 
         public async Task OrderIdShouldExistWhenSelected(int? id)
@@ -31,11 +29,6 @@ namespace Business.Features.Orders.Rules
             return Task.CompletedTask;
         }
 
-        public async Task TheNumberOfProductsOrderedShouldNotBeMoreThanStock(int productId,int quantity)
-        {
-            Product? product = await _productDal.GetAsync(p => p.Id == productId);
-            if (product.Quantity < quantity) throw new BusinessException(RequestedProductQuantityIsNotInStock);
-        }
         public async Task OrderNumberMustBeUnique(string orderNumber)
         {
             Order? result = await _orderDal.GetAsync(p => p.OrderNumber == orderNumber);

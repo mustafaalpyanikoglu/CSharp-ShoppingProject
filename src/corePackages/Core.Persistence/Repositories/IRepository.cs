@@ -8,6 +8,7 @@ namespace Core.Persistence.Repositories
         List<T> GetAll(Expression<Func<T, bool>> filter = null);
         T Add(T entity);
         T Update(T entity);
+        List<T> UpdateRange(List<T> entity);
         T Delete(T entity);
 
         /*T Get(Expression<Func<T, bool>> predicate, Func<IQueryable<T>,
