@@ -50,6 +50,7 @@ namespace Core.Persistence.Repositories
         {
             using (Context)
             {
+
                 return filter == null ? Context.Set<TEntity>().ToList() : Context.Set<TEntity>().Where(filter).ToList();
             }
         }
@@ -89,6 +90,12 @@ namespace Core.Persistence.Repositories
             Context.SaveChanges();
             return entity;
         }
+        public List<TEntity> UpdateRange(List<TEntity> entity)
+        {
+            Context.UpdateRange(entity);
+            Context.SaveChanges();
+            return entity;
+        }
 
         public TEntity Delete(TEntity entity)
         {
@@ -120,6 +127,13 @@ namespace Core.Persistence.Repositories
             if (!enableTracking) queryable = queryable.AsNoTracking();
             if (include != null) queryable = include(queryable);
             return await queryable.ToPaginateAsync(index, size, 0, cancellationToken);
+        }
+
+        public async Task<List<TEntity>> UpdateRangeAsync(List<TEntity> entity)
+        {
+            Context.Entry(entity).State = EntityState.Modified;
+            await Context.SaveChangesAsync();
+            return entity;
         }
     }
 }

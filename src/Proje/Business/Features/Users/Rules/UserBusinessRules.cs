@@ -23,6 +23,11 @@ public class UserBusinessRules : BaseBusinessRules
         User? result = await _userDal.GetAsync(t => t.Id == id);
         if (result == null) throw new BusinessException(UserNotFound);
     }
+    public async Task UserEmailMustBeAvailable(string email)
+    {
+        User? result = await _userDal.GetAsync(t => t.Email == email);
+        if (result == null) throw new BusinessException(UserNotFound);
+    }
 
     public async Task UserEmailMustNotExist(string email)
     {

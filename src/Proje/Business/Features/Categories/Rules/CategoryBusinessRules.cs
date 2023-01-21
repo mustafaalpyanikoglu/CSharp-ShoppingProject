@@ -22,6 +22,11 @@ namespace Business.Features.Categorys.Rules
             Category? result = await _categoryDal.GetAsync(b => b.Id == id);
             if (result == null) throw new BusinessException(CategoryMessages.CategoryNotFound);
         }
+        public async Task CategoryNameShouldExistWhenSelected(string categoryName)
+        {
+            Category? result = await _categoryDal.GetAsync(b => b.Name == categoryName);
+            if (result == null) throw new BusinessException(CategoryMessages.CategoryNotFound);
+        }
         public async Task CategoryNameShouldBeNotExists(string name)
         {
             Category? user = await _categoryDal.GetAsync(u => u.Name.ToLower() == name.ToLower());

@@ -41,8 +41,14 @@ namespace WebAPI.Controllers
             PurseListModel result = await Mediator.Send(getListPurseQuery);
             return Ok(result);
         }
-        [HttpGet("{Id}")]
+        [HttpGet("/GetBy/Id/{Id}")]
         public async Task<IActionResult> GetById([FromRoute] GetByIdPurseQuery getByIdPurseQuery)
+        {
+            PurseDto result = await Mediator.Send(getByIdPurseQuery);
+            return Ok(result);
+        }
+        [HttpGet("GetBy/Email/{Email}")]
+        public async Task<IActionResult> GetByEmail([FromRoute] GetByEmailPurseQuery getByIdPurseQuery)
         {
             PurseDto result = await Mediator.Send(getByIdPurseQuery);
             return Ok(result);

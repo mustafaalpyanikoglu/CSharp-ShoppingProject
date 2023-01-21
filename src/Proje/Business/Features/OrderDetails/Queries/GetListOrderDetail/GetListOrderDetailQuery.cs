@@ -12,7 +12,7 @@ using static Entities.Constants.OperationClaims;
 
 namespace Business.Features.OrderDetailDetails.Queries.GetListOrderDetailDetail
 {
-    public class GetListOrderDetailQuery : IRequest<OrderDetailListModel>//, ISecuredRequest
+    public class GetListOrderDetailQuery : IRequest<OrderDetailListModel>, ISecuredRequest
     {
         public PageRequest PageRequest { get; set; }
         public string[] Roles => new[] { Admin, OrderDetailGet };

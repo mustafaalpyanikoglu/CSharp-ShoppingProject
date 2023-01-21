@@ -22,6 +22,11 @@ namespace Business.Features.Products.Rules
             Product? result = await _ProductDal.GetAsync(b => b.Id == id);
             if (result ==null) throw new BusinessException(ProductMessages.ProductNotFound);
         }
+        public async Task ProductNameShouldExistWhenSelected(string productName)
+        {
+            Product? result = await _ProductDal.GetAsync(b => b.Name == productName);
+            if (result == null) throw new BusinessException(ProductMessages.ProductNotFound);
+        }
         public async Task ProductNameShouldBeNotExists(string name)
         {
             Product? user = await _ProductDal.GetAsync(u => u.Name.ToLower() == name.ToLower());
