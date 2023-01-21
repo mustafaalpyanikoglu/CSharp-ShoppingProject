@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Business.Features.OrderDetails.Models;
 using Business.Features.Orders.Models;
 using Core.Application.Pipelines.Authorization;
 using Core.Application.Requests;
@@ -7,12 +8,13 @@ using Core.Persistence.Paging;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using static Business.Features.Orders.Constants.Orders;
 using static Entities.Constants.OperationClaims;
 
 namespace Business.Features.Orders.Queries.GetListOrderByDynamic
 {
-    public class GetListOrderByDynamicQuery:IRequest<OrderListModel>, ISecuredRequest
+    public class GetListOrderByDynamicQuery:IRequest<OrderListModel>//, ISecuredRequest
     {
         public PageRequest PageRequest { get; set; }
         public Dynamic Dynamic { get; set; }
@@ -33,7 +35,7 @@ namespace Business.Features.Orders.Queries.GetListOrderByDynamic
             {
                 IPaginate<Order> Orders = await _OrderDal.GetListByDynamicAsync(
                                       request.Dynamic,
-                                      null,
+                                      include: x => x.Include(c => c.UserCart.User),
                                       request.PageRequest.Page,
                                       request.PageRequest.PageSize);
                 OrderListModel mappedOrderListModel = _mapper.Map<OrderListModel>(Orders);
