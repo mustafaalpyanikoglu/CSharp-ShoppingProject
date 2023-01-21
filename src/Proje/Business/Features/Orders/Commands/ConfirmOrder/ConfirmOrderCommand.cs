@@ -2,11 +2,10 @@
 using Business.Features.OrderDetails.Rules;
 using Business.Features.Orders.Dtos;
 using Business.Features.Orders.Rules;
-using Business.Services.OrderDetailService;
 using Business.Services.PurseService;
+using Core.Application.Pipelines.Authorization;
 using Core.Persistence.Paging;
 using DataAccess.Abstract;
-using DataAccess.Concrete.EntityFramework;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +14,7 @@ using static Entities.Constants.OperationClaims;
 
 namespace Business.Features.Orders.Commands.ConfirmOrder
 {
-    public class ConfirmOrderCommand:IRequest<ConfirmOrderDto>//,ISecuredRequest
+    public class ConfirmOrderCommand:IRequest<ConfirmOrderDto>,ISecuredRequest
     {
         public int OrderId { get; set; }
 
@@ -24,60 +23,80 @@ namespace Business.Features.Orders.Commands.ConfirmOrder
         public class ConfirmOrderCommandHandler : IRequestHandler<ConfirmOrderCommand, ConfirmOrderDto>
         {
             private readonly IMapper _mapper;
+            private readonly IUserCartDal _userCartDal;
             private readonly IPurseDal _purseDal;
+            private readonly IOrderDal _orderDal;
             private readonly IOrderDetailDal _orderDetailDal;
+            private readonly IPurseService _purseService;
+            private readonly IProductDal _productDal;
             private readonly OrderBusinessRules _orderBusinessRules;
             private readonly OrderDetailBusinessRules _orderDetailBusinessRules;
-            private readonly IOrderDal _orderDal;
 
-            public ConfirmOrderCommandHandler(IMapper mapper, IPurseDal purseDal, IOrderDetailDal orderDetailDal, OrderBusinessRules orderBusinessRules, OrderDetailBusinessRules orderDetailBusinessRules, IOrderDal orderDal)
+            public ConfirmOrderCommandHandler(IMapper mapper, IUserCartDal userCartDal, IPurseDal purseDal, 
+                IOrderDal orderDal, IOrderDetailDal orderDetailDal, IPurseService purseService, 
+                IProductDal productDal, OrderBusinessRules orderBusinessRules, OrderDetailBusinessRules orderDetailBusinessRules)
             {
                 _mapper = mapper;
+                _userCartDal = userCartDal;
                 _purseDal = purseDal;
+                _orderDal = orderDal;
                 _orderDetailDal = orderDetailDal;
+                _purseService = purseService;
+                _productDal = productDal;
                 _orderBusinessRules = orderBusinessRules;
                 _orderDetailBusinessRules = orderDetailBusinessRules;
-                _orderDal = orderDal;
             }
 
             public async Task<ConfirmOrderDto> Handle(ConfirmOrderCommand request, CancellationToken cancellationToken)
             {
                 Order order = await _orderBusinessRules.ExistingDataShouldBeFetchedWhenTransactionRequestIdIsSelected(request.OrderId);
-                await _orderDetailBusinessRules.IsThereAnyProductInTheCart(request.OrderId);
                 await _orderBusinessRules.OrderStatusMustBeFalse(order.Status);
+                await _orderDetailBusinessRules.IsThereAnyProductInTheCart(order.Id);
 
+                UserCart? userCart = await _userCartDal.GetAsync(u => u.Id == order.UserCartId);
+                Purse? purse = await _purseDal.GetAsync(p => p.UserId == userCart.UserId);
+                
+                float totalPrice = 0;
 
-                Purse? purse = await _purseDal.GetByUserCartId(order.UserCartId);
+                IPaginate<OrderDetail> orderDetails = await _orderDetailDal.GetListAsync(
+                    o => o.OrderId == request.OrderId,
+                    include: c => c.Include(c => c.Product)
+                                   .Include(c => c.Product.Category)
+                                   .Include(c => c.Order)
+                                   .Include(c => c.Order.UserCart)
+                                   .Include(c => c.Order.UserCart.User)
+                );
+                List<Product> products = new List<Product>();
+                foreach (var item in orderDetails.Items)  //sepetin tutarı hesaplanır
+                {
+                    totalPrice += item.TotalPrice;
+                    products.Add(item.Product);
+                }
+                foreach (var item in orderDetails.Items) //stoktaki ürünlerin miktarı azaltılır
+                {
+                    foreach (var product in products)
+                    {
+                        if (product.Id == item.ProductId)
+                        {
+                            product.Quantity -= item.Quantity;
+                        }
+                    }
+                }
+                _productDal.UpdateRange(products); //alınan ürünler toplu bir şekilde güncellenir
 
-                var a = await _orderDetailDal.GetListAsync(o => o.OrderId == request.OrderId);
+                await _purseService.SpendMoney(purse,totalPrice);
 
-                return null;
+                order.Status = true;
+                order.ApprovalDate = Convert.ToDateTime(DateTime.Now.ToString("F"));
+                order.OrderDate = order.OrderDate;
+                order.OrderNumber = order.OrderNumber;
+                order.UserCartId = order.UserCartId;
 
-                //List<OrderDetail> orderDetails = _orderDetailDal.GetAll(x => x.OrderId == request.OrderId);
-                //Product? product = await _productDal.GetAsync(p => p.Id == orderDetails.SingleOrDefault().ProductId);
+                Order updatedOrder = await _orderDal.UpdateAsync(order); //sipariş durumu onaylanır
+                ConfirmOrderDto confirmOrderDto = _mapper.Map<ConfirmOrderDto>(updatedOrder);
+                confirmOrderDto.TotalPrice = totalPrice;
 
-                //float totalPrice = _orderDetailDal.CalculateAmountInCart(request.OrderId);
-                //await _purseService.SpendMoney(purse, totalPrice); //Kullanıcının yeterli parası varsa parası azalır
-
-                //foreach (var item in orderDetails) //sipariş alınan her ürün için stokda ki miktarı kontrol edilir varsa azaltılır
-                //{
-                //    Product updatedProduct = await _orderDetailBusinessRules.TheNumberOfProductsOrderDetailedShouldNotBeMoreThanStock(item.ProductId, item.Quantity);
-                //    updatedProduct.Quantity -= item.Quantity;
-                //    await _productDal.UpdateAsync(updatedProduct);
-                //}
-
-                //order.Status = true;
-                //order.OrderDate = order.OrderDate;
-                //order.ApprovalDate = Convert.ToDateTime(DateTime.Now.ToString("F"));
-                //order.OrderNumber = order.OrderNumber;
-                //order.UserCartId = order.UserCartId;
-
-                //Order updatedOrder = await _orderDal.UpdateAsync(order); //sipariş durumu onaylanır
-                //ConfirmOrderDto confirmOrderDto = _mapper.Map<ConfirmOrderDto>(updatedOrder);
-                //confirmOrderDto.OrderNumber = updatedOrder.OrderNumber;
-                //confirmOrderDto.TotalPrice = totalPrice;
-
-                //return confirmOrderDto;
+                return confirmOrderDto;
             }
         }
     }

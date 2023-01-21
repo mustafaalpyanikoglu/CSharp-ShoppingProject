@@ -15,7 +15,8 @@ namespace DataAccess.Concrete.EntityFramework
         {
             using (Context)
             {
-                return Context.OrderDetails.Sum(o => o.TotalPrice);
+                return Context.OrderDetails.Where(o => o.OrderId == orderId).Sum(o => o.TotalPrice);
+
             }
         }
 
