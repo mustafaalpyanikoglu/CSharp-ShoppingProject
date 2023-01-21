@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Business.Features.Products.Models;
+using Core.Application.Pipelines.Authorization;
 using Core.Application.Requests;
 using Core.Persistence.Dynamic;
 using Core.Persistence.Paging;
@@ -7,13 +8,17 @@ using DataAccess.Abstract;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using static Business.Features.Products.Constants.OperationClaims;
+using static Entities.Constants.OperationClaims;
 
 namespace Business.Features.Products.Queries.GetListProductByDynamic
 {
-    public class GetListProductByDynamicQuery : IRequest<ProductListModel>
+    public class GetListProductByDynamicQuery : IRequest<ProductListModel>,ISecuredRequest
     {
         public PageRequest PageRequest { get; set; }
         public Dynamic Dynamic { get; set; }
+
+        public string[] Roles => new[] { Admin, Customer };
 
         public class GetListProductByDynamicQueryHandler : IRequestHandler<GetListProductByDynamicQuery, ProductListModel>
         {

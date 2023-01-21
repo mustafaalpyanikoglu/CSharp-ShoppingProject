@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Business.Features.UserOperationClaims.Dtos;
 using Business.Features.UserOperationClaims.Rules;
+using Core.Application.Pipelines.Authorization;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using MediatR;
@@ -9,7 +10,7 @@ using static Entities.Constants.OperationClaims;
 
 namespace Business.Features.UserOperationClaims.Commands.CreateUserOperationClaim
 {
-    public class CreateUserOperationClaimCommand : IRequest<CreateUserOperationClaimDto>//, ISecuredRequest
+    public class CreateUserOperationClaimCommand : IRequest<CreateUserOperationClaimDto>, ISecuredRequest
     {
         public int UserId { get; set; }
         public int OperationClaimId { get; set; }

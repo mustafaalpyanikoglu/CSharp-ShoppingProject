@@ -1,8 +1,8 @@
-﻿using Business.Features.Products.Commands.CreateProduct;
+﻿using Business.Features.Products.Models;
+using Business.Features.Products.Commands.CreateProduct;
 using Business.Features.Products.Commands.DeleteProduct;
 using Business.Features.Products.Commands.UpdateProduct;
 using Business.Features.Products.Dtos;
-using Business.Features.Products.Models;
 using Business.Features.Products.Queries.GetByIdProduct;
 using Business.Features.Products.Queries.GetListProduct;
 using Business.Features.Products.Queries.GetListProductByDynamic;
@@ -12,6 +12,7 @@ using Core.Application.Requests;
 using Core.Persistence.Dynamic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Business.Features.Products.Queries.GetByNameProduct;
 
 namespace WebAPI.Controllers
 {
@@ -19,13 +20,6 @@ namespace WebAPI.Controllers
     [ApiController]
     public class ProductController : BaseController
     {
-        private readonly IProductService _productService;
-
-        public ProductController(IProductService productService)
-        {
-            _productService = productService;
-        }
-
         [HttpPost("add")]
         public async Task<IActionResult> Add([FromBody] CreateProductCommand createProductCommand)
         {
@@ -51,10 +45,16 @@ namespace WebAPI.Controllers
             ProductListModel result = await Mediator.Send(getListProductQuery);
             return Ok(result);
         }
-        [HttpGet("{Id}")]
+        [HttpGet("GetBy/ProductId/{Id}")]
         public async Task<IActionResult> GetById([FromRoute] GetByIdProductQuery getByIdProductQuery)
         {
             ProductDto result = await Mediator.Send(getByIdProductQuery);
+            return Ok(result);
+        }
+        [HttpGet("GetBy/ProductName/{ProductName}")]
+        public async Task<IActionResult> GetByName([FromRoute] GetByNameProductQuery getByNameProductQuery)
+        {
+            ProductDto result = await Mediator.Send(getByNameProductQuery);
             return Ok(result);
         }
         [HttpPost("GetList/ByDynamic")]
@@ -65,19 +65,11 @@ namespace WebAPI.Controllers
             ProductListModel result = await Mediator.Send(getListProductByDynamicQuery);
             return Ok(result);
         }
-        [HttpPost("GetList/ByName/ByDynamic")]
-        public async Task<IActionResult> GetListByName([FromQuery] PageRequest pageRequest,
-                                                      [FromBody] Dynamic? dynamic = null)
+        [HttpGet("GetList/ByCategoryName/{categoryName}")]
+        public async Task<IActionResult> GetListByCategoryName([FromRoute] string categoryName, [FromQuery] PageRequest pageRequest)
         {
-            GetListProductByNameQuery getListProductByNameQuery = new() { PageRequest = pageRequest, Dynamic = dynamic };
-            ProductListByNameModel result = await Mediator.Send(getListProductByNameQuery);
-            return Ok(result);
-        }
-
-        [HttpPost("GetList/ByName2")]
-        public IActionResult GetListByName2([FromBody] string productName)
-        {
-            Task<ProductListByNameDto> result = _productService.GetListProductByName(productName);
+            GetListByCategoryNameQuery getListByCategoryNameQuery = new() { CategoryName = categoryName, PageRequest = pageRequest };
+            ProductListByNameModel result = await Mediator.Send(getListByCategoryNameQuery);
             return Ok(result);
         }
     }
