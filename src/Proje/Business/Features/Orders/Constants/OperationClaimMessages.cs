@@ -12,6 +12,7 @@
         public const string RequestedProductQuantityIsNotInStock = "requested product quantity is not in stock";
         public const string OrderNumberIsNotUnique = "order number is not unique";
         public const string OrderHasAlreadyBeenConfirmed = "order has already been confirmed";
+        public const string OrderHasALreadyBeenCreated = "order has already been created";
 
     }
 }

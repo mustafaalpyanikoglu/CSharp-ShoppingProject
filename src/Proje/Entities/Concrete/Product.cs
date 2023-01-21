@@ -10,11 +10,11 @@ namespace Entities.Concrete
         public float Price { get; set; }
 
         public virtual Category Category { get; set; }
-        public virtual ICollection<Order> Orders { get; set; }
+        public virtual ICollection<OrderDetail> OrderDetails { get; set; }
 
         public Product()
         {
-            Orders = new HashSet<Order>();
+            OrderDetails = new HashSet<OrderDetail>();
         }
 
         public Product(int id, int categoryId, string name, int quantity, float price):this()

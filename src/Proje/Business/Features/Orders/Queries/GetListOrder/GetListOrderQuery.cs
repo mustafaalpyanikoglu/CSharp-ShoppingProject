@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Business.Features.OrderDetails.Models;
 using Business.Features.Orders.Models;
 using Business.Features.Orders.Rules;
 using Core.Application.Pipelines.Authorization;
@@ -7,12 +8,13 @@ using Core.Persistence.Paging;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using static Business.Features.Orders.Constants.Orders;
 using static Entities.Constants.OperationClaims;
 
 namespace Business.Features.Orders.Queries.GetListOrder
 {
-    public class GetListOrderQuery : IRequest<OrderListModel>, ISecuredRequest
+    public class GetListOrderQuery : IRequest<OrderListModel>//, ISecuredRequest
     {
         public PageRequest PageRequest { get; set; }
         public string[] Roles => new[] { Admin, OrderGet };
@@ -31,7 +33,8 @@ namespace Business.Features.Orders.Queries.GetListOrder
             public async Task<OrderListModel> Handle(GetListOrderQuery request, CancellationToken cancellationToken)
             {
                 IPaginate<Order> Orders = await _OrderDal.GetListAsync(index: request.PageRequest.Page,
-                                                                       size: request.PageRequest.PageSize);
+                                                                       size: request.PageRequest.PageSize,
+                                                                       include: x => x.Include(c => c.UserCart.User));
                 OrderListModel mappedOrderListModel = _mapper.Map<OrderListModel>(Orders);
                 return mappedOrderListModel;
 

@@ -5,12 +5,13 @@ using Core.Application.Pipelines.Authorization;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using static Business.Features.Orders.Constants.Orders;
 using static Entities.Constants.OperationClaims;
 
 namespace Business.Features.Orders.Queries.GetByIdOrder
 {
-    public class GetByIdOrderQuery : IRequest<OrderDto>, ISecuredRequest
+    public class GetByIdOrderQuery : IRequest<OrderDto>//, ISecuredRequest
     {
         public int Id { get; set; }
         public string[] Roles => new[] { Admin, OrderGet };
@@ -32,7 +33,8 @@ namespace Business.Features.Orders.Queries.GetByIdOrder
             {
                 await _OrderBusinessRules.OrderIdShouldExistWhenSelected(request.Id);
 
-                Order? Order = await _OrderDal.GetAsync(m => m.Id == request.Id);
+                Order? Order = await _OrderDal.GetAsync(m => m.Id == request.Id,
+                                                        include: x => x.Include(c => c.UserCart.User));
                 OrderDto OrderDto = _mapper.Map<OrderDto>(Order);
 
                 return OrderDto;

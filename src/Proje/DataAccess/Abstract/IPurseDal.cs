@@ -5,5 +5,6 @@ namespace DataAccess.Abstract
 {
     public interface IPurseDal : IRepository<Purse>, IAsyncRepository<Purse>
     {
+        Task<Purse> GetByUserCartId(int userCartId);
     }
 }
