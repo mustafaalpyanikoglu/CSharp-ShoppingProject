@@ -11,7 +11,7 @@ using static Entities.Constants.OperationClaims;
 
 namespace Business.Features.Orders.Commands.ConfirmOrder
 {
-    public class ConfirmOrderCommand:IRequest<ConfirmOrderDto>//,ISecuredRequest
+    public class ConfirmOrderCommand:IRequest<ConfirmOrderDto>,ISecuredRequest
     {
         public int OrderId { get; set; }
 

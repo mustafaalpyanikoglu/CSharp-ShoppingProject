@@ -10,7 +10,7 @@ using static Entities.Constants.OperationClaims;
 
 namespace Business.Features.Orders.Commands.UpdateProductQuantityInOrder
 {
-    public class UpdateProductQuantityInOrderCommand:IRequest<UpdateProductQuantityInOrderDto>//,ISecuredRequest
+    public class UpdateProductQuantityInOrderCommand:IRequest<UpdateProductQuantityInOrderDto>,ISecuredRequest
     {
         public int Id { get; set; }
         public int Quantity { get; set; }
