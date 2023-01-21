@@ -2,7 +2,6 @@
 using Core.Persistence.Paging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
-using System.Drawing;
 using System.Linq.Expressions;
 namespace Core.Persistence.Repositories
 {
@@ -129,11 +128,11 @@ namespace Core.Persistence.Repositories
             return await queryable.ToPaginateAsync(index, size, 0, cancellationToken);
         }
 
-        public async Task<List<TEntity>> UpdateRangeAsync(List<TEntity> entity)
+        public async Task<List<TEntity>> UpdateRangeAsync(List<TEntity> entityList)
         {
-            Context.Entry(entity).State = EntityState.Modified;
+            Context.Entry(entityList).State = EntityState.Modified;
             await Context.SaveChangesAsync();
-            return entity;
+            return entityList;
         }
     }
 }

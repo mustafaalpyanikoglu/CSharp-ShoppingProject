@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Business.Features.OrderDetails.Commands.UpdateOrder;
+using Business.Features.OrderDetails.Rules;
 using Business.Features.Orders.Dtos;
 using Business.Features.Orders.Rules;
 using Business.Features.Products.Rules;
@@ -33,8 +34,9 @@ namespace Business.Features.Orders.Commands.CreateOrder
             private readonly OrderBusinessRules _orderBusinessRules;
             private readonly UserCartBusinessRules _userCartBusinessRules;
             private readonly ProductBusinessRules _productBusinessRules;
+            private readonly OrderDetailBusinessRules _orderDetailBusinessRules;
 
-            public CreateOrderCommandHandler(IMapper mapper, IOrderDal orderDal, IOrderService orderService, IOrderDetailDal orderDetailDal, IProductDal productDal, OrderBusinessRules orderBusinessRules, UserCartBusinessRules userCartBusinessRules, ProductBusinessRules productBusinessRules)
+            public CreateOrderCommandHandler(IMapper mapper, IOrderDal orderDal, IOrderService orderService, IOrderDetailDal orderDetailDal, IProductDal productDal, OrderBusinessRules orderBusinessRules, UserCartBusinessRules userCartBusinessRules, ProductBusinessRules productBusinessRules, OrderDetailBusinessRules orderDetailBusinessRules)
             {
                 _mapper = mapper;
                 _orderDal = orderDal;
@@ -44,13 +46,14 @@ namespace Business.Features.Orders.Commands.CreateOrder
                 _orderBusinessRules = orderBusinessRules;
                 _userCartBusinessRules = userCartBusinessRules;
                 _productBusinessRules = productBusinessRules;
+                _orderDetailBusinessRules = orderDetailBusinessRules;
             }
 
             public async Task<CreatedOrderDto> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
             {
                 await _userCartBusinessRules.UserCartIdShouldExistWhenSelected(request.UserCartId);
                 Product product = await _productBusinessRules.ExistingDataShouldBeFetchedWhenTransactionRequestIdIsSelected(request.ProductId);
-                await _orderBusinessRules.TheNumberOfProductsOrderedShouldNotBeMoreThanStock(request.ProductId, request.Quantity);
+                await _orderDetailBusinessRules.TheNumberOfProductsOrderDetailedShouldNotBeMoreThanStock(request.ProductId, request.Quantity);
                 
                 Order order = await _orderDal.GetAsync(o => o.UserCartId == request.UserCartId && o.Status == false);
                 string temorOrderNumber = order == null ? "" : order.OrderNumber; 

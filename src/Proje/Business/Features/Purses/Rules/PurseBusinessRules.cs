@@ -28,6 +28,12 @@ namespace Business.Features.Purses.Rules
             if (money <= 0) throw new BusinessException(PurseMessages.InvalidAmountOfMoney);
             return Task.CompletedTask;
         }
+        public Task IsTheMoneyEnough(float totalPrice, float moneyInAccount)
+        {
+            if (totalPrice > moneyInAccount ) throw new BusinessException(PurseMessages.InvalidAmountOfMoney);
+            return Task.CompletedTask;
+        }
+
         public Task TheMoneyToBeSpentCannotBeMoreThanTheAmountInTheWallet(float money, float spendMoney)
         {
             if (money < spendMoney) throw new BusinessException(PurseMessages.InsufficientMoney);
