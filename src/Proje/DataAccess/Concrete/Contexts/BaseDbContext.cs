@@ -16,6 +16,7 @@ namespace DataAccess.Concrete.Contexts
         public DbSet<Order> Orders { get; set; }
         public DbSet<UserCart> UserCarts { get; set; }
         public DbSet<Purse> Purses { get; set; }
+        public DbSet<OrderDetail> OrderDetails { get; set; }
 
 
         public BaseDbContext(DbContextOptions dbContextOptions, IConfiguration configuration):base(dbContextOptions)

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(BaseDbContext))]
-    [Migration("20230120155907_createDB")]
-    partial class createDB
+    [Migration("20230121123940_CreateDb")]
+    partial class CreateDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -107,6 +107,34 @@ namespace DataAccess.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("OrderNumber");
 
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit")
+                        .HasColumnName("Status");
+
+                    b.Property<int>("UserCartId")
+                        .HasColumnType("int")
+                        .HasColumnName("UserCartId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserCartId");
+
+                    b.ToTable("Orders", (string)null);
+                });
+
+            modelBuilder.Entity("Entities.Concrete.OrderDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int")
+                        .HasColumnName("OrderId");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("int")
                         .HasColumnName("ProductId");
@@ -115,25 +143,17 @@ namespace DataAccess.Migrations
                         .HasColumnType("int")
                         .HasColumnName("Quantity");
 
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit")
-                        .HasColumnName("Status");
-
                     b.Property<float>("TotalPrice")
                         .HasColumnType("real")
                         .HasColumnName("TotalPrice");
 
-                    b.Property<int>("UserCartId")
-                        .HasColumnType("int")
-                        .HasColumnName("UserCartId");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("UserCartId");
-
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("OrderDetails", (string)null);
                 });
 
             modelBuilder.Entity("Entities.Concrete.Product", b =>
@@ -306,21 +326,32 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("Entities.Concrete.Order", b =>
                 {
-                    b.HasOne("Entities.Concrete.Product", "Product")
-                        .WithMany("Orders")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Entities.Concrete.UserCart", "UserCart")
                         .WithMany("Orders")
                         .HasForeignKey("UserCartId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Product");
-
                     b.Navigation("UserCart");
+                });
+
+            modelBuilder.Entity("Entities.Concrete.OrderDetail", b =>
+                {
+                    b.HasOne("Entities.Concrete.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entities.Concrete.Product", "Product")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Entities.Concrete.Product", b =>
@@ -377,7 +408,7 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("Entities.Concrete.Product", b =>
                 {
-                    b.Navigation("Orders");
+                    b.Navigation("OrderDetails");
                 });
 
             modelBuilder.Entity("Entities.Concrete.User", b =>

@@ -41,6 +41,12 @@ namespace Business.Features.Orders.Rules
             Order? result = await _orderDal.GetAsync(p => p.OrderNumber == orderNumber);
             if (result != null) throw new BusinessException(OrderNumberIsNotUnique);
         }
+        public async Task<Order> HasAnOrderBeenCreated(Order order)
+        {
+            Order? result = await _orderDal.GetAsync(p => p.OrderNumber == order.OrderNumber);
+            if (result != null) throw new BusinessException(OrderHasALreadyBeenCreated);
+            return result;
+        }
 
         public async Task OperationMustBeAvailable()
         {
@@ -54,12 +60,17 @@ namespace Business.Features.Orders.Rules
             return new SuccessDataResult<List<Order>>(result, OrderAvaliable);
         }
 
-        public async Task<Order> ExistingDataShouldBeFetchedWhenTransactionRequestIdIsSelected(int id)
+        public async Task<Order> ExistingDataShouldBeFetchedWhenTransactionRequestIdIsSelected(int orderID)
         {
-            Order? result = await _orderDal.GetAsync(b => b.Id == id);
+            Order? result = await _orderDal.GetAsync(b => b.Id == orderID);
             if (result == null) throw new BusinessException(OrderNotFound);
             return result;
         }
-
+        public async Task<Order> IsThereAnOrderToBeConfirmed(int userCartId)
+        {
+            Order? result = await _orderDal.GetAsync(b => b.UserCartId == userCartId && b.Status == false);
+            if (result == null) throw new BusinessException(OrderNotFound);
+            return result;
+        }
     }
 }

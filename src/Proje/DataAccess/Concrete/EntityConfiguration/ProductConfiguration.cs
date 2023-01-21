@@ -17,7 +17,7 @@ namespace DataAccess.Concrete.EntityConfiguration
             builder.Property(u => u.Price).HasColumnName("Price").IsRequired();
 
             builder.HasOne(u => u.Category).WithMany().HasForeignKey(u => u.CategoryId);
-            builder.HasMany(u => u.Orders).WithOne(u => u.Product);
+            builder.HasMany(u => u.OrderDetails).WithOne(u => u.Product);
             #endregion
         }
     }

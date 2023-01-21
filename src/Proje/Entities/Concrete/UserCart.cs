@@ -1,4 +1,5 @@
 ﻿using Core.Persistence.Repositories;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Entities.Concrete
 {
@@ -18,6 +19,11 @@ namespace Entities.Concrete
         {
             Id= id; 
             UserId= userId;
+        }
+
+        public IIncludableQueryable<UserCart, object> Include(Func<object, object> value)
+        {
+            throw new NotImplementedException();
         }
     }
 }

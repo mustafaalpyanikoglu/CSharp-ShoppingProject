@@ -1,6 +1,6 @@
-﻿namespace Business.Features.Orders.Dtos
+﻿namespace Business.Features.OrderDetails.Dtos
 {
-    public class OrderListDtoForCustomer
+    public class OrderDetailListDtoForCustomer
     {
         public string CategoryName { get; set; }
         public string ProductName { get; set; }
