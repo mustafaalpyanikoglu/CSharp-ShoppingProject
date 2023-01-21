@@ -47,8 +47,6 @@ namespace Business.Features.OrderDetails.Profiles
                 .ForMember(t => t.ProductQuantity, opt => opt.MapFrom(u => u.Product.Quantity))
                 .ForMember(t => t.ProductPrice, opt => opt.MapFrom(u => u.Product.Price))
                 .ReverseMap();
-            CreateMap<IPaginate<OrderDetail>, OrderDetailListModel>().ReverseMap(); 
-            CreateMap<IPaginate<OrderDetail>, OrderDetailListByUserCartModel>().ReverseMap();
             CreateMap<OrderDetail, OrderDetailListDtoForCustomer>()
                 .ForMember(t => t.FirstName, opt => opt.MapFrom(u => u.Order.UserCart.User.FirstName))
                 .ForMember(t => t.LastName, opt => opt.MapFrom(u => u.Order.UserCart.User.LastName))
@@ -59,6 +57,22 @@ namespace Business.Features.OrderDetails.Profiles
                 .ForMember(t => t.ProductName, opt => opt.MapFrom(u => u.Product.Name))
                 .ForMember(t => t.ProductPrice, opt => opt.MapFrom(u => u.Product.Price))
                 .ReverseMap();
+            CreateMap<OrderDetail, UserPastOrderListDto>()
+               .ForMember(t => t.FirstName, opt => opt.MapFrom(u => u.Order.UserCart.User.FirstName))
+               .ForMember(t => t.LastName, opt => opt.MapFrom(u => u.Order.UserCart.User.LastName))
+               .ForMember(t => t.Address, opt => opt.MapFrom(u => u.Order.UserCart.User.Address))
+               .ForMember(t => t.OrderNumber, opt => opt.MapFrom(u => u.Order.OrderNumber))
+               .ForMember(t => t.OrderDate, opt => opt.MapFrom(u => u.Order.OrderDate))
+               .ForMember(t => t.ApprovalDate, opt => opt.MapFrom(u => u.Order.ApprovalDate))
+               .ForMember(t => t.CategoryName, opt => opt.MapFrom(u => u.Product.Category.Name))
+               .ForMember(t => t.ProductName, opt => opt.MapFrom(u => u.Product.Name))
+               .ForMember(t => t.ProductPrice, opt => opt.MapFrom(u => u.Product.Price))
+               .ReverseMap();
+
+
+            CreateMap<IPaginate<OrderDetail>, OrderDetailListModel>().ReverseMap();
+            CreateMap<IPaginate<OrderDetail>, OrderDetailListByUserCartModel>().ReverseMap();
+            CreateMap<IPaginate<OrderDetail>, UserPastOrderListModel>().ReverseMap();
         }
     }
 }
