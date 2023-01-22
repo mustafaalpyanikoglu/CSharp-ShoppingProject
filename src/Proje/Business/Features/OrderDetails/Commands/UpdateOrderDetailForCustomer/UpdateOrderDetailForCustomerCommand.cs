@@ -44,30 +44,17 @@ namespace Business.Features.OrderDetails.Commands.UpdateOrderDetailForCustomer
 
                 if(request.Quantity == 0) //Sepetteki ürün sıfırlanıyorsa ürün sepetten silinmeli
                 {
-                    List<OrderDetail> orderDetails = _orderDetailDal.GetAll(o => o.OrderId == request.Id);
-                    if(orderDetails.Count > 1) //Bu septte birden fazla ürün varsa sadece o ürünü siler
-                    {
-                        OrderDetail deletedOrderDetail = await _orderDetailDal.DeleteAsync(orderDetail);
-                        UpdatedOrderDetailForCustomerDto deleteOrderDetailForCustomerDto = _mapper.Map<UpdatedOrderDetailForCustomerDto>(deletedOrderDetail);
-                        return deleteOrderDetailForCustomerDto;
-                    }
-                    else // Bu sepette 1 tane ürün varsa o ürünü siler ve oluşturulan siparişi de siler
-                    {
-                        Order order = await _orderDal.GetAsync(o => o.Id == orderDetail.OrderId);
-                        await _orderDal.DeleteAsync(order);
-
-                        OrderDetail deletedOrderDetail = await _orderDetailDal.DeleteAsync(orderDetail);
-                        UpdatedOrderDetailForCustomerDto deleteOrderDetailForCustomerDto = _mapper.Map<UpdatedOrderDetailForCustomerDto>(deletedOrderDetail);
-                        return deleteOrderDetailForCustomerDto;
-                    }
+                    OrderDetail deletedOrderDetail = await _orderDetailDal.DeleteAsync(orderDetail);
+                    UpdatedOrderDetailForCustomerDto deleteOrderDetailForCustomerDto = _mapper.Map<UpdatedOrderDetailForCustomerDto>(deletedOrderDetail);
+                    return deleteOrderDetailForCustomerDto;
                 }
 
-                OrderDetail mappedOrderDetail = _mapper.Map<OrderDetail>(request);
+                orderDetail.TotalPrice = product.Price * request.Quantity;
+                orderDetail.ProductId = orderDetail.ProductId;
+                orderDetail.Quantity = request.Quantity;
+                orderDetail.Id = request.Id;
 
-                mappedOrderDetail.TotalPrice = product.Price * request.Quantity; 
-                mappedOrderDetail.ProductId = orderDetail.ProductId;
-
-                OrderDetail updatedOrderDetail = await _orderDetailDal.UpdateAsync(mappedOrderDetail);
+                OrderDetail updatedOrderDetail = await _orderDetailDal.UpdateAsync(orderDetail);
                 UpdatedOrderDetailForCustomerDto updateOrderDetailDto = _mapper.Map<UpdatedOrderDetailForCustomerDto>(updatedOrderDetail);
 
                 return updateOrderDetailDto;

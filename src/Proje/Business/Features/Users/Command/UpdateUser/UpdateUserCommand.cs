@@ -17,8 +17,8 @@ namespace Business.Features.Users.Command.UpdateUser
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
         public string Address { get; set; }
-        public string Email { get; set; }
         public bool Status { get; set; }
+        public string Email { get; set; }
 
         public string[] Roles => new[] { Admin, UserUpdate };
 
@@ -37,8 +37,7 @@ namespace Business.Features.Users.Command.UpdateUser
 
             public async Task<UpdatedUserDto> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
             {
-                await _userBusinessRules.UserIdShouldExistWhenSelected(request.Id);
-                await _userBusinessRules.UserEmailMustBePresent(request.Email);
+                await _userBusinessRules.UserIdMustBeAvailable(request.Id);
 
                 User mappedUser = _mapper.Map<User>(request);
 

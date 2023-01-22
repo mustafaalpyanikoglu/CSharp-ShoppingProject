@@ -32,6 +32,7 @@ namespace Business.Features.UserCarts.Commands.CreateUserCart
             public async Task<CreatedUserCartDto> Handle(CreateUserCartCommand request, CancellationToken cancellationToken)
             {
                 await _userBusinessRules.UserIdMustBeAvailable(request.UserId);
+                await _userBusinessRules.ShouldNotHaveUserCart(request.UserId);
 
                 UserCart mappedUserCart = _mapper.Map<UserCart>(request);
                 UserCart createdUserCart = await _userCartDal.AddAsync(mappedUserCart);
