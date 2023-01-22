@@ -48,9 +48,9 @@ namespace Business.Features.Orders.Commands.CreateOrder
                 Product product = await _productBusinessRules.ExistingDataShouldBeFetchedWhenTransactionRequestIdIsSelected(request.ProductId);
                 await _orderDetailBusinessRules.TheNumberOfProductsOrderDetailedShouldNotBeMoreThanStock(request.ProductId, request.Quantity);
                 
-                Order order = await _unitOfWork.OrderDal.GetAsync(o => o.UserCartId == request.UserCartId && o.Status == false);
-                string temorOrderNumber = order == null ? "" : order.OrderNumber; 
-                Order currentOrder = await _unitOfWork.OrderDal.GetAsync(o=> o.OrderNumber == temorOrderNumber);
+                Order? order = await _unitOfWork.OrderDal.GetAsync(o => o.UserCartId == request.UserCartId && o.Status == false);
+                string temporOrderNumber = order == null ? "" : order.OrderNumber; 
+                Order? currentOrder = await _unitOfWork.OrderDal.GetAsync(o=> o.OrderNumber == temporOrderNumber);
 
                 if(currentOrder == null)
                 {
@@ -79,16 +79,16 @@ namespace Business.Features.Orders.Commands.CreateOrder
                 }
                 else
                 {
-                    OrderDetail updatedOrderDetail = await _unitOfWork.OrderDetailDal.GetAsync(o => o.OrderId == currentOrder.Id && o.ProductId == request.ProductId);
+                    OrderDetail? updatedOrderDetail = await _unitOfWork.OrderDetailDal.GetAsync(o => o.OrderId == currentOrder.Id && o.ProductId == request.ProductId);
                     if (updatedOrderDetail != null)
                     {
                         updatedOrderDetail.Quantity = updatedOrderDetail.Quantity + request.Quantity;
                         updatedOrderDetail.TotalPrice = updatedOrderDetail.Quantity * product.Price;
-                        OrderDetail mappedUpdatedOrderDetail2 = await _unitOfWork.OrderDetailDal.UpdateAsync(updatedOrderDetail);
+                        await _unitOfWork.OrderDetailDal.UpdateAsync(updatedOrderDetail);
                     }
                     else
                     {
-                        OrderDetail addedOrderDetail = await _unitOfWork.OrderDetailDal.AddAsync(new OrderDetail
+                        await _unitOfWork.OrderDetailDal.AddAsync(new OrderDetail
                         {
                             OrderId = currentOrder.Id,
                             ProductId = request.ProductId,
