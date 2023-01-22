@@ -1,13 +1,15 @@
-﻿using Business.Features.OrderDetailDetails.Queries.GetByIdOrderDetailDetail;
-using Business.Features.OrderDetailDetails.Queries.GetListOrderDetailDetail;
+﻿using Business.Features.OrderDetailDetails.Queries.GetListOrderDetailDetail;
 using Business.Features.OrderDetailDetails.Queries.GetListOrderDetailDetailByDynamic;
 using Business.Features.OrderDetailDetails.Queries.GetListOrderDetailDetailByUserCart;
 using Business.Features.OrderDetailDetails.Queries.GetListPastOrderDetailDetail;
 using Business.Features.OrderDetails.Commands.CreateOrder;
 using Business.Features.OrderDetails.Commands.DeleteOrder;
 using Business.Features.OrderDetails.Commands.UpdateOrder;
+using Business.Features.OrderDetails.Commands.UpdateOrderDetailForCustomer;
 using Business.Features.OrderDetails.Dtos;
 using Business.Features.OrderDetails.Models;
+using Business.Features.OrderDetails.Queries.GetByIdOrderDetail;
+using Business.Features.OrderDetails.Queries.GetByOrderDetailByOrderName;
 using Core.Application.Requests;
 using Core.Persistence.Dynamic;
 using Microsoft.AspNetCore.Http;
@@ -23,6 +25,12 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> Add([FromBody] CreateOrderDetailCommand createOrderDetailCommand)
         {
             CreatedOrderDetailDto result = await Mediator.Send(createOrderDetailCommand);
+            return Created("", result);
+        }
+        [HttpPut("updateproductquantity")]
+        public async Task<IActionResult> Add([FromBody] UpdateOrderDetailForCustomerCommand updateOrderDetailForCustomerCommand)
+        {
+            UpdatedOrderDetailForCustomerDto result = await Mediator.Send(updateOrderDetailForCustomerCommand);
             return Created("", result);
         }
         [HttpDelete("delete")]
@@ -44,7 +52,7 @@ namespace WebAPI.Controllers
             OrderDetailListModel result = await Mediator.Send(getListOrderDetailQuery);
             return Ok(result);
         }
-        [HttpGet("GetList/UserId/{userId}")]
+        [HttpGet("GetList/MyUserCart/UserId/{userId}")]
         public async Task<IActionResult> GetListOrderByUserCart([FromRoute] int userId, [FromQuery] PageRequest pageRequest)
         {
             GetListOrderDetailByUserCartQuery getListOrderByUserCartQuery = new() { UserId = userId, PageRequest = pageRequest };

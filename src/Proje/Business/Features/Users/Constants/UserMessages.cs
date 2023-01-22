@@ -22,5 +22,7 @@
         public const string PasswordDontMatch = "password dont match";
         public const string MailAvailable = "mail available";
         public const string AccessTokenNotCreated = "access token not created";
+        public const string ThisUserHasAUserCart = "this user has a user cart";
+        public const string ThisUserHasAPurse = "this user has a purse";
     }
 }

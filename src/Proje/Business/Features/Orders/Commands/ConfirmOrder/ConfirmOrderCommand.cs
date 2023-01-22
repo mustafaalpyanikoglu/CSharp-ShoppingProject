@@ -61,10 +61,6 @@ namespace Business.Features.Orders.Commands.ConfirmOrder
                 IPaginate<OrderDetail> orderDetails = await _orderDetailDal.GetListAsync(
                     o => o.OrderId == request.OrderId,
                     include: c => c.Include(c => c.Product)
-                                   .Include(c => c.Product.Category)
-                                   .Include(c => c.Order)
-                                   .Include(c => c.Order.UserCart)
-                                   .Include(c => c.Order.UserCart.User)
                 );
                 List<Product> products = new List<Product>();
                 foreach (var item in orderDetails.Items)  //sepetin tutarı hesaplanır

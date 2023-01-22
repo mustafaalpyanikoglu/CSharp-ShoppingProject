@@ -2,10 +2,13 @@
 using Business.Features.Users.Dtos;
 using Business.Features.Users.Rules;
 using Business.Services.AuthService;
+using Core.Application.Pipelines.Authorization;
 using Core.Security.Hashing;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using MediatR;
+using static Business.Features.Users.Constants.OperationClaims;
+using static Entities.Constants.OperationClaims;
 
 namespace Business.Features.Users.Command.UpdateUserFromAuth
 {
@@ -16,6 +19,7 @@ namespace Business.Features.Users.Command.UpdateUserFromAuth
         public string LastName { get; set; }
         public string Password { get; set; }
         public string? NewPassword { get; set; }
+
 
         public class UpdateUserFromAuthCommandHandler : IRequestHandler<UpdateUserFromAuthCommand, UpdatedUserFromAuthDto>
         {

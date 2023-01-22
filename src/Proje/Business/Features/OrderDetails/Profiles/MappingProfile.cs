@@ -20,9 +20,9 @@ namespace Business.Features.OrderDetails.Profiles
             CreateMap<OrderDetail, UpdateOrderDetailCommand>().ReverseMap();
             CreateMap<OrderDetail, UpdateOrderDetailForCustomerCommand>().ReverseMap();
             CreateMap<OrderDetail, UpdatedOrderDetailForCustomerDto>().ReverseMap();
-            CreateMap<OrderDetail, CreatedOrderDto>().ReverseMap();
-            CreateMap<OrderDetail, DeletedOrderDto>().ReverseMap();
-            CreateMap<OrderDetail, UpdatedOrderDto>().ReverseMap();
+            CreateMap<OrderDetail, CreatedOrderDetailDto>().ReverseMap();
+            CreateMap<OrderDetail, DeletedOrderDetailDto>().ReverseMap();
+            CreateMap<OrderDetail, UpdatedOrderDetailDto>().ReverseMap();
             CreateMap<OrderDetail, OrderDetailDto>()
                 .ForMember(t => t.FirstName, opt => opt.MapFrom(u => u.Order.UserCart.User.FirstName))
                 .ForMember(t => t.LastName, opt => opt.MapFrom(u => u.Order.UserCart.User.LastName))

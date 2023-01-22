@@ -23,6 +23,17 @@ public class UserBusinessRules : BaseBusinessRules
         User? result = await _userDal.GetAsync(t => t.Id == id);
         if (result == null) throw new BusinessException(UserNotFound);
     }
+    public async Task ShouldNotHaveUserCart(int userId)
+    {
+        User? result = await _userDal.GetAsync(t => t.Id == userId);
+        if (result != null) throw new BusinessException(ThisUserHasAUserCart);
+    }
+    public async Task ShouldNotHavePuser(int userId)
+    {
+        User? result = await _userDal.GetAsync(t => t.Id == userId);
+        if (result != null) throw new BusinessException(ThisUserHasAPurse);
+    }
+
     public async Task UserEmailMustBeAvailable(string email)
     {
         User? result = await _userDal.GetAsync(t => t.Email == email);

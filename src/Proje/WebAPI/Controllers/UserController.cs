@@ -18,12 +18,12 @@ namespace WebAPI.Controllers
     [ApiController]
     public class UserController : BaseController
     {
-        [HttpPost("add")]
-        public async Task<IActionResult> Add([FromBody] CreateUserCommand createUserCommand)
-        {
-            CreatedUserDto result = await Mediator.Send(createUserCommand);
-            return Created("", result);
-        }
+        //[HttpPost("add")]     Register metodu kullanılıyor
+        //public async Task<IActionResult> Add([FromBody] CreateUserCommand createUserCommand)
+        //{
+        //    CreatedUserDto result = await Mediator.Send(createUserCommand);
+        //    return Created("", result);
+        //}
         [HttpDelete("delete")]
         public async Task<IActionResult> Delete([FromBody] DeleteUserCommand deleteUserCommand)
         {
