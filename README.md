@@ -1,6 +1,24 @@
 # Shooping Project
 
-This repository created for Shopping Project
+This project was built with mediatr pipeline architecture.
+
+## Tech Stack
+
+- .Net 6
+- Entity Framework
+- Web Api
+- Swagger
+- Data Transfer Object
+- Automapper
+- Unit of Work
+- Jwt
+- Fluent Validation
+- Result Structure
+- Generic Repository
+- Dependency Injection
+- Exception Handling
+- MediatR
+- AutoMapper
 
 ## Postman
 
