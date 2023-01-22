@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
 using Business.Features.OrderDetails.Models;
 using Business.Features.OrderDetails.Rules;
+using Business.Features.Orders.Constants;
 using Business.Features.Users.Rules;
 using Business.Services.OrderDetailService;
 using Core.Application.Pipelines.Authorization;
 using Core.Application.Requests;
+using Core.CrossCuttingConcerns.Exceptions;
 using Core.Persistence.Paging;
-using DataAccess.Abstract;
 using DataAccess.Concrete.EfUnitOfWork;
 using Entities.Concrete;
 using MediatR;
@@ -47,6 +48,7 @@ namespace Business.Features.OrderDetailDetails.Queries.GetListPastOrderDetailDet
                 await _userBusinessRules.UserIdMustBeAvailable(request.UserId);
 
                 OrderDetail? orderDetail = await _unitOfWork.OrderDetailDal.GetAsync(o => o.Order.UserCart.UserId == request.UserId, include: c => c.Include(c => c.Order));
+                if(orderDetail == null) throw new BusinessException(OrderMessages.PreviousOrderNotAvailable);
                 await _orderDetailBusinessRules.OrderDetailIdShouldExistWhenSelected(orderDetail.Id);
 
                 float totalPrice = await _orderDetailService.AmountUserCart(orderDetail.OrderId);

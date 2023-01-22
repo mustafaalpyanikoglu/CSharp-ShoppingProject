@@ -3,7 +3,6 @@ using Business.Features.OrderDetails.Dtos;
 using Business.Features.OrderDetails.Rules;
 using Business.Features.Orders.Rules;
 using Core.Application.Pipelines.Authorization;
-using DataAccess.Abstract;
 using DataAccess.Concrete.EfUnitOfWork;
 using Entities.Concrete;
 using MediatR;

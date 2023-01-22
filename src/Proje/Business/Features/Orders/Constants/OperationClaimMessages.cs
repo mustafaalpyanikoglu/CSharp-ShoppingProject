@@ -13,6 +13,7 @@
         public const string OrderNumberIsNotUnique = "order number is not unique";
         public const string OrderHasAlreadyBeenConfirmed = "order has already been confirmed";
         public const string OrderHasALreadyBeenCreated = "order has already been created";
+        public const string PreviousOrderNotAvailable = "previous order not available";
 
     }
 }
