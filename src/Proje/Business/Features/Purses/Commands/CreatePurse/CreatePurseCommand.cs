@@ -7,7 +7,7 @@ using MediatR;
 using Business.Features.Users.Rules;
 using static Business.Features.Purses.Constants.OperationClaims;
 using static Entities.Constants.OperationClaims;
-using DataAccess.Concrete.Contexts;
+using DataAccess.Concrete.EfUnitOfWork;
 
 namespace Business.Features.Purses.Commands.CreatePurse
 {

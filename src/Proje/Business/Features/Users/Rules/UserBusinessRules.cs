@@ -4,8 +4,8 @@ using Core.Security.Hashing;
 using Entities.Concrete;
 using Core.Application.Rules;
 using Core.CrossCuttingConcerns.Exceptions;
-using DataAccess.Concrete.Contexts;
 using static Business.Features.Users.Constants.UserMessages;
+using DataAccess.Concrete.EfUnitOfWork;
 
 namespace Business.Features.Users.Rules;
 

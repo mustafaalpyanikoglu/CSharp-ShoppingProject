@@ -1,5 +1,5 @@
 ﻿using Core.Persistence.Paging;
-using DataAccess.Concrete.Contexts;
+using DataAccess.Concrete.EfUnitOfWork;
 using Entities.Concrete;
 using Microsoft.EntityFrameworkCore;
 

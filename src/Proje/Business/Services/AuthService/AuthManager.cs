@@ -4,10 +4,10 @@ using Business.Services.UserService;
 using Core.Utilities.Abstract;
 using Core.Utilities.Concrete;
 using Core.Security.Hashing;
-using DataAccess.Abstract;
 using Entities.Concrete;
 using Microsoft.EntityFrameworkCore;
 using Core.Security.Jwt;
+using DataAccess.Concrete.EfUnitOfWork;
 using static Business.Features.Auths.Constants.AuthMessages;
 using static Business.Features.Users.Constants.UserMessages;
 
@@ -16,24 +16,16 @@ namespace Business.Services.AuthService
     public class AuthManager : IAuthService
     {
         private readonly IUserService _userService;
-        private readonly IUserCartDal _userCartDal;
-        private readonly IUserDal _userDal;
-        private readonly IPurseDal _purseDal;
         private readonly ITokenHelper _tokenHelper;
         private readonly AuthBusinessRules _authBusinessRules;
-        private readonly IUserOperationClaimDal _userOperationClaimDal;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AuthManager(IUserService userService, IUserCartDal userCartDal, IUserDal userDal, 
-            IPurseDal purseDal, ITokenHelper tokenHelper, AuthBusinessRules authBusinessRules, 
-            IUserOperationClaimDal userOperationClaimDal)
+        public AuthManager(IUserService userService, ITokenHelper tokenHelper, AuthBusinessRules authBusinessRules, IUnitOfWork unitOfWork)
         {
             _userService = userService;
-            _userCartDal = userCartDal;
-            _userDal = userDal;
-            _purseDal = purseDal;
             _tokenHelper = tokenHelper;
             _authBusinessRules = authBusinessRules;
-            _userOperationClaimDal = userOperationClaimDal;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IResult> ChangePassword(UserForChangePasswordDto userForChangePasswordDto)
@@ -45,14 +37,16 @@ namespace Business.Services.AuthService
             HashingHelper.CreatePasswordHash(userForChangePasswordDto.Password, out passwordHash, out passwordSalt);
             userResult.Data.PasswordHash = passwordHash;
             userResult.Data.PasswordSalt = passwordSalt;
-            await _userDal.UpdateAsync(userResult.Data);
+            await _unitOfWork.UserDal.UpdateAsync(userResult.Data);
+
+            await _unitOfWork.SaveChangesAsync();
 
             return new SuccessResult(PasswordChangedSuccessfully);
         }
 
         public async Task<AccessToken> CreateAccessToken(User user)
         {
-            IList<OperationClaim> operationClaims = await _userOperationClaimDal
+            IList<OperationClaim> operationClaims = await _unitOfWork.UserOperationClaimDal
                     .Query()
                     .AsNoTracking()
                     .Where(p => p.UserId == user.Id)
@@ -105,23 +99,25 @@ namespace Business.Services.AuthService
 
             await _userService.Add(user);
 
-            User? addRolToUser = await _userDal.GetAsync(u => u.Email == user.Email);
-            await _userOperationClaimDal.AddAsync(new UserOperationClaim
+            User? addRolToUser = await _unitOfWork.UserDal.GetAsync(u => u.Email == user.Email);
+            await _unitOfWork.UserOperationClaimDal.AddAsync(new UserOperationClaim
             {
                 UserId = addRolToUser.Id,
                 OperationClaimId = 2
             });
 
-            await _purseDal.AddAsync(new Purse
+            await _unitOfWork.PurseDal.AddAsync(new Purse
             {
                 UserId = addRolToUser.Id,
                 Money = 10
             });
 
-            await _userCartDal.AddAsync(new UserCart
+            await _unitOfWork.UserCartDal.AddAsync(new UserCart
             {
                 UserId = addRolToUser.Id
             });
+
+            await _unitOfWork.SaveChangesAsync();
 
             return new SuccessDataResult<User>(user, UserRegistered);
         }

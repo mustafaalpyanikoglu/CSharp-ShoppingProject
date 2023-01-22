@@ -1,9 +1,10 @@
 ﻿using Core.Persistence.Repositories;
 using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 
-namespace DataAccess.Concrete.Contexts
+namespace DataAccess.Concrete.EfUnitOfWork
 {
-    public class UnitOfWork:IUnitOfWork
+    public class UnitOfWork : IUnitOfWork
     {
         private readonly BaseDbContext _baseDbContext;
         public ICategoryDal CategoryDal { get; }
@@ -16,8 +17,8 @@ namespace DataAccess.Concrete.Contexts
         public IUserDal UserDal { get; }
         public IUserOperationClaimDal UserOperationClaimDal { get; }
 
-        public UnitOfWork(BaseDbContext baseDbContext, ICategoryDal categoryDal, IOperationClaimDal operationClaimDal, 
-            IOrderDal orderDal, IOrderDetailDal orderDetailDal, IProductDal productDal, IPurseDal purseDal, 
+        public UnitOfWork(BaseDbContext baseDbContext, ICategoryDal categoryDal, IOperationClaimDal operationClaimDal,
+            IOrderDal orderDal, IOrderDetailDal orderDetailDal, IProductDal productDal, IPurseDal purseDal,
             IUserCartDal userCartDal, IUserDal userDal, IUserOperationClaimDal userOperationClaimDal)
         {
             _baseDbContext = baseDbContext;

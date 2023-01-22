@@ -2,37 +2,35 @@
 using Business.Features.Users.Rules;
 using Core.Utilities.Abstract;
 using Core.Utilities.Concrete;
-using DataAccess.Abstract;
+using DataAccess.Concrete.EfUnitOfWork;
 using Entities.Concrete;
 
 namespace Business.Services.UserService
 {
     public class UserManager : IUserService
     {
-        private readonly IUserDal _userDal;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly UserBusinessRules _userBusinessRules;
 
-        public UserManager(IUserDal userDal, UserBusinessRules userBusinessRules)
+        public UserManager(IUnitOfWork unitOfWork, UserBusinessRules userBusinessRules)
         {
-            _userDal = userDal;
+            _unitOfWork = unitOfWork;
             _userBusinessRules = userBusinessRules;
-        }
-
-        public UserManager(IUserDal userDal)
-        {
-            _userDal = userDal;
         }
 
         public async Task<IResult> Add(User user)
         {
-            await _userDal.AddAsync(user);
+            await _unitOfWork.UserDal.AddAsync(user);
+
+            await _unitOfWork.SaveChangesAsync();
+
             return new SuccessResult(UserMessages.UserAdded);
         }
 
         public async Task<IDataResult<List<OperationClaim>>> GetClaims(User user)
         {
             IDataResult<User> userGetClaims = await _userBusinessRules.UserIdShouldExistWhenSelected(user.Id);
-            return new SuccessDataResult<List<OperationClaim>>(_userDal.GetClaims(userGetClaims.Data), UserMessages.UserRolesListed);
+            return new SuccessDataResult<List<OperationClaim>>(_unitOfWork.UserDal.GetClaims(userGetClaims.Data), UserMessages.UserRolesListed);
         }
 
         public async Task<IDataResult<User>> GetUserByEmail(string email)
