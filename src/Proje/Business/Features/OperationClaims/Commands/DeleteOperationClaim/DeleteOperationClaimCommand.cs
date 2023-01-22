@@ -7,6 +7,7 @@ using Entities.Concrete;
 using static Business.Features.OperationClaims.Constants.OperationClaims;
 using static Entities.Constants.OperationClaims;
 using Core.Application.Pipelines.Authorization;
+using DataAccess.Concrete.Contexts;
 
 namespace Business.Features.OperationClaims.Commands.DeleteOperationClaim
 {
@@ -18,13 +19,13 @@ namespace Business.Features.OperationClaims.Commands.DeleteOperationClaim
 
         public class DeleteOperationClaimCommandHandler : IRequestHandler<DeleteOperationClaimCommand, DeletedOperationClaimDto>
         {
-            private readonly IOperationClaimDal _operationClaimDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
             private readonly OperationClaimBusinessRules _operationClaimBusinessRules;
 
-            public DeleteOperationClaimCommandHandler(IOperationClaimDal operationClaimDal, IMapper mapper, OperationClaimBusinessRules operationClaimBusinessRules)
+            public DeleteOperationClaimCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, OperationClaimBusinessRules operationClaimBusinessRules)
             {
-                _operationClaimDal = operationClaimDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
                 _operationClaimBusinessRules = operationClaimBusinessRules;
             }
@@ -34,8 +35,10 @@ namespace Business.Features.OperationClaims.Commands.DeleteOperationClaim
                 await _operationClaimBusinessRules.OperationClaimIdShouldExistWhenSelected(request.Id);
 
                 OperationClaim mappedOperationClaim = _mapper.Map<OperationClaim>(request);
-                OperationClaim deletedOperationClaim = await _operationClaimDal.DeleteAsync(mappedOperationClaim);
+                OperationClaim deletedOperationClaim = await _unitOfWork.OperationClaimDal.DeleteAsync(mappedOperationClaim);
                 DeletedOperationClaimDto deleteOperationClaimDto = _mapper.Map<DeletedOperationClaimDto>(deletedOperationClaim);
+
+                await _unitOfWork.SaveChangesAsync();
 
                 return deleteOperationClaimDto;
             }

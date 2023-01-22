@@ -2,12 +2,12 @@
 using Business.Features.Purses.Dtos;
 using Business.Features.Purses.Rules;
 using Core.Application.Pipelines.Authorization;
-using DataAccess.Abstract;
 using Entities.Concrete;
 using MediatR;
 using Business.Features.Users.Rules;
 using static Business.Features.Purses.Constants.OperationClaims;
 using static Entities.Constants.OperationClaims;
+using DataAccess.Concrete.Contexts;
 
 namespace Business.Features.Purses.Commands.CreatePurse
 {
@@ -21,14 +21,15 @@ namespace Business.Features.Purses.Commands.CreatePurse
         public class CreatePurseCommandHandler : IRequestHandler<CreatePurseCommand, CreatedPurseDto>
         {
             private readonly IMapper _mapper;
-            private readonly IPurseDal _purseDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly PurseBusinessRules _purseBusinessRules;
             private readonly UserBusinessRules _userBusinessRules;
 
-            public CreatePurseCommandHandler(IMapper mapper, IPurseDal purseDal, PurseBusinessRules purseBusinessRules, UserBusinessRules userBusinessRules)
+            public CreatePurseCommandHandler(IMapper mapper, IUnitOfWork unitOfWork, 
+                PurseBusinessRules purseBusinessRules, UserBusinessRules userBusinessRules)
             {
                 _mapper = mapper;
-                _purseDal = purseDal;
+                _unitOfWork = unitOfWork;
                 _purseBusinessRules = purseBusinessRules;
                 _userBusinessRules = userBusinessRules;
             }
@@ -39,8 +40,10 @@ namespace Business.Features.Purses.Commands.CreatePurse
                 await _userBusinessRules.ShouldNotHavePuser(request.UserId);
 
                 Purse mappedPurse = _mapper.Map<Purse>(request);
-                Purse createdPurse = await _purseDal.AddAsync(mappedPurse);
+                Purse createdPurse = await _unitOfWork.PurseDal.AddAsync(mappedPurse);
                 CreatedPurseDto createPurseDto = _mapper.Map<CreatedPurseDto>(createdPurse);
+
+                await _unitOfWork.SaveChangesAsync();
 
                 return createPurseDto;
             }

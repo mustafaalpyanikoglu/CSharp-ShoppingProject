@@ -3,7 +3,7 @@ using Business.Features.UserCarts.Dtos;
 using Business.Features.UserCarts.Rules;
 using Business.Features.Users.Rules;
 using Core.Application.Pipelines.Authorization;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using static Business.Features.UserCarts.Constants.OperationClaims;
@@ -21,14 +21,14 @@ namespace Business.Features.UserCarts.Commands.UpdateUserCart
         public class UpdateUserCartCommandHandler : IRequestHandler<UpdateUserCartCommand, UpdatedUserCartDto>
         {
             private readonly IMapper _mapper;
-            private readonly IUserCartDal _userCartDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly UserCartBusinessRules _userCartBusinessRules;
             private readonly UserBusinessRules _userBusinessRules;
 
-            public UpdateUserCartCommandHandler(IMapper mapper, IUserCartDal userCartDal, UserCartBusinessRules userCartBusinessRules, UserBusinessRules userBusinessRules)
+            public UpdateUserCartCommandHandler(IMapper mapper, IUnitOfWork unitOfWork, UserCartBusinessRules userCartBusinessRules, UserBusinessRules userBusinessRules)
             {
                 _mapper = mapper;
-                _userCartDal = userCartDal;
+                _unitOfWork = unitOfWork;
                 _userCartBusinessRules = userCartBusinessRules;
                 _userBusinessRules = userBusinessRules;
             }
@@ -39,8 +39,10 @@ namespace Business.Features.UserCarts.Commands.UpdateUserCart
                 await _userBusinessRules.UserIdMustBeAvailable(request.UserId);
 
                 UserCart mappedUserCart = _mapper.Map<UserCart>(request);
-                UserCart UpdatedUserCart = await _userCartDal.UpdateAsync(mappedUserCart);
+                UserCart UpdatedUserCart = await _unitOfWork.UserCartDal.UpdateAsync(mappedUserCart);
                 UpdatedUserCartDto UpdateUserCartDto = _mapper.Map<UpdatedUserCartDto>(UpdatedUserCart);
+
+                await _unitOfWork.SaveChangesAsync();
 
                 return UpdateUserCartDto;
             }

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Business.Features.Categories.Dtos;
 using Business.Features.Categorys.Rules;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 
@@ -13,13 +13,13 @@ namespace Business.Features.Categories.Queries.GetListCategoryByName
 
         public class GetByNameCategoryQueryHandler : IRequestHandler<GetByNameCategoryQuery, CategoryDto>
         {
-            private readonly ICategoryDal _CategoryDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
             private readonly CategoryBusinessRules _categoryBusinessRules;
 
-            public GetByNameCategoryQueryHandler(ICategoryDal categoryDal, IMapper mapper, CategoryBusinessRules categoryBusinessRules)
+            public GetByNameCategoryQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, CategoryBusinessRules categoryBusinessRules)
             {
-                _CategoryDal = categoryDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
                 _categoryBusinessRules = categoryBusinessRules;
             }
@@ -28,7 +28,7 @@ namespace Business.Features.Categories.Queries.GetListCategoryByName
             {
                 await _categoryBusinessRules.CategoryNameShouldExistWhenSelected(request.CategoryName);
 
-                Category? category  = await _CategoryDal.GetAsync(c=> c.Name == request.CategoryName);
+                Category? category  = await _unitOfWork.CategoryDal.GetAsync(c=> c.Name == request.CategoryName);
                 CategoryDto CategoryDto = _mapper.Map<CategoryDto>(category);
 
                 return CategoryDto;

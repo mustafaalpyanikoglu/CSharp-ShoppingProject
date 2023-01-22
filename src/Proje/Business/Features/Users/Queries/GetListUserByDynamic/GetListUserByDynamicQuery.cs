@@ -4,7 +4,7 @@ using Core.Application.Pipelines.Authorization;
 using Core.Application.Requests;
 using Core.Persistence.Dynamic;
 using Core.Persistence.Paging;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -21,18 +21,18 @@ namespace Business.Features.Users.Queries.GetListUserByDynamic
 
         public class GetListUserByDynamicQueryHandler : IRequestHandler<GetListUserByDynamicQuery, UserListModel>
         {
-            private readonly IUserDal _userDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
 
-            public GetListUserByDynamicQueryHandler(IUserDal userDal, IMapper mapper)
+            public GetListUserByDynamicQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
             {
-                _userDal = userDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
             }
 
             public async Task<UserListModel> Handle(GetListUserByDynamicQuery request, CancellationToken cancellationToken)
             {
-                IPaginate<User> userOperationClaims = await _userDal.GetListByDynamicAsync(
+                IPaginate<User> userOperationClaims = await _unitOfWork.UserDal.GetListByDynamicAsync(
                                       request.Dynamic,
                                       include: c => c.Include(c => c.UserOperationClaims),
                                       request.PageRequest.Page,

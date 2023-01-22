@@ -5,6 +5,7 @@ using Core.Application.Requests;
 using Core.Persistence.Dynamic;
 using Core.Persistence.Paging;
 using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -22,18 +23,18 @@ namespace Business.Features.Products.Queries.GetListProductByDynamic
 
         public class GetListProductByDynamicQueryHandler : IRequestHandler<GetListProductByDynamicQuery, ProductListModel>
         {
-            private readonly IProductDal _productDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
 
-            public GetListProductByDynamicQueryHandler(IProductDal productDal, IMapper mapper)
+            public GetListProductByDynamicQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
             {
-                _productDal = productDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
             }
 
             public async Task<ProductListModel> Handle(GetListProductByDynamicQuery request, CancellationToken cancellationToken)
             {
-                IPaginate<Product> products = await _productDal.GetListByDynamicAsync(
+                IPaginate<Product> products = await _unitOfWork.ProductDal.GetListByDynamicAsync(
                                       request.Dynamic,
                                       include: x => x.Include(c => c.Category),
                                       request.PageRequest.Page,

@@ -1,6 +1,5 @@
-﻿using Business.Features.Orders.Constants;
-using Core.Persistence.Paging;
-using DataAccess.Abstract;
+﻿using Core.Persistence.Paging;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,17 +7,17 @@ namespace Business.Services.OrderDetailService
 {
     public class OrderDetailManager:IOrderDetailService
     {
-        private readonly IOrderDetailDal _orderDetailDal;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public OrderDetailManager(IOrderDetailDal orderDetailDal)
+        public OrderDetailManager(IUnitOfWork unitOfWork)
         {
-            _orderDetailDal = orderDetailDal;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<float> AmountUserCart(int orderId)
         {
             float totalPrice = 0;
-            IPaginate<OrderDetail> orderDetails = await _orderDetailDal.GetListAsync(
+            IPaginate<OrderDetail> orderDetails = await _unitOfWork.OrderDetailDal.GetListAsync(
                     o => o.OrderId == orderId,
                     include: c => c.Include(c => c.Product)
                                    .Include(c => c.Product.Category)
@@ -36,7 +35,7 @@ namespace Business.Services.OrderDetailService
 
         public async Task<List<OrderDetail>> ListOrdersToBeConfirmed(int orderId)
         {
-            return _orderDetailDal.GetAll(o=>o.OrderId== orderId);
+            return _unitOfWork.OrderDetailDal.GetAll(o=>o.OrderId== orderId);
         }
         
     }

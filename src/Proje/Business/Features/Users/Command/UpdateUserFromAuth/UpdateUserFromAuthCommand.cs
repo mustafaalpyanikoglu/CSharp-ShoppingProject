@@ -2,9 +2,8 @@
 using Business.Features.Users.Dtos;
 using Business.Features.Users.Rules;
 using Business.Services.AuthService;
-using Core.Application.Pipelines.Authorization;
 using Core.Security.Hashing;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using static Business.Features.Users.Constants.OperationClaims;
@@ -23,14 +22,15 @@ namespace Business.Features.Users.Command.UpdateUserFromAuth
 
         public class UpdateUserFromAuthCommandHandler : IRequestHandler<UpdateUserFromAuthCommand, UpdatedUserFromAuthDto>
         {
-            private readonly IUserDal _userDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
             private readonly UserBusinessRules _userBusinessRules;
             private readonly IAuthService _authService;
 
-            public UpdateUserFromAuthCommandHandler(IUserDal userDal, IMapper mapper, UserBusinessRules userBusinessRules, IAuthService authService)
+            public UpdateUserFromAuthCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, 
+                UserBusinessRules userBusinessRules, IAuthService authService)
             {
-                _userDal = userDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
                 _userBusinessRules = userBusinessRules;
                 _authService = authService;
@@ -38,7 +38,7 @@ namespace Business.Features.Users.Command.UpdateUserFromAuth
 
             public async Task<UpdatedUserFromAuthDto> Handle(UpdateUserFromAuthCommand request, CancellationToken cancellationToken)
             {
-                User? user = await _userDal.GetAsync(u => u.Id == request.Id);
+                User? user = await _unitOfWork.UserDal.GetAsync(u => u.Id == request.Id);
                 await _userBusinessRules.UserShouldBeExist(user);
                 await _userBusinessRules.UserPasswordShouldBeMatch(user, request.Password);
 
@@ -51,9 +51,12 @@ namespace Business.Features.Users.Command.UpdateUserFromAuth
                     user.PasswordHash = passwordHash;
                     user.PasswordSalt = passwordSalt;
                 }
-                User updatedUser = await _userDal.UpdateAsync(user);
+                User updatedUser = await _unitOfWork.UserDal.UpdateAsync(user);
                 UpdatedUserFromAuthDto updatedUserFromAuthDto = _mapper.Map<UpdatedUserFromAuthDto>(updatedUser);
                 updatedUserFromAuthDto.AccessToken = await _authService.CreateAccessToken(user);
+
+                await _unitOfWork.SaveChangesAsync();
+
                 return updatedUserFromAuthDto;
             }
         }

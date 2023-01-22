@@ -3,7 +3,7 @@ using AutoMapper;
 using Business.Features.Auths.Dtos;
 using Core.Application.Pipelines.Authorization;
 using Core.Security.Hashing;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using static Entities.Constants.OperationClaims;
@@ -20,13 +20,13 @@ namespace Business.Features.Auths.Commands.ChangePassword
 
         public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordCommand, UserForChangePasswordDto>
         {
-            private readonly IUserDal _userDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
             private readonly AuthBusinessRules _authBusinessRules;
 
-            public ChangePasswordCommandHandler(IUserDal userDal, IMapper mapper, AuthBusinessRules authBusinessRules)
+            public ChangePasswordCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, AuthBusinessRules authBusinessRules)
             {
-                _userDal = userDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
                 _authBusinessRules = authBusinessRules;
             }
@@ -38,16 +38,19 @@ namespace Business.Features.Auths.Commands.ChangePassword
 
                 byte[] passwordHash, passwordSalt;
 
-                User? user = await _userDal.GetAsync(u => u.Email == request.Email);
+                User? user = await _unitOfWork.UserDal.GetAsync(u => u.Email == request.Email);
 
                 HashingHelper.CreatePasswordHash(request.NewPassword, out passwordHash, out passwordSalt);
 
                 user.PasswordSalt = passwordSalt;
                 user.PasswordHash = passwordHash;
 
-                User updatedUser= await _userDal.UpdateAsync(user);
+                User updatedUser= await _unitOfWork.UserDal.UpdateAsync(user);
                 UserForChangePasswordDto updatedUserDto = _mapper.Map<UserForChangePasswordDto>(updatedUser);
                 updatedUserDto.Password = request.NewPassword;
+
+                await _unitOfWork.SaveChangesAsync();
+
                 return updatedUserDto;
 
             }

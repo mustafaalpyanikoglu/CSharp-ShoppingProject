@@ -3,7 +3,7 @@ using Business.Features.UserCarts.Models;
 using Core.Application.Pipelines.Authorization;
 using Core.Application.Requests;
 using Core.Persistence.Paging;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -20,18 +20,18 @@ namespace Business.Features.UserCarts.Queries.GetListUserCart
 
         public class GetListUserCartQueryHanlder : IRequestHandler<GetListUserCartQuery, UserCartListModel>
         {
-            private readonly IUserCartDal _UserCartDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
 
-            public GetListUserCartQueryHanlder(IUserCartDal UserCartDal, IMapper mapper)
+            public GetListUserCartQueryHanlder(IUnitOfWork unitOfWork, IMapper mapper)
             {
-                _UserCartDal = UserCartDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
             }
 
             public async Task<UserCartListModel> Handle(GetListUserCartQuery request, CancellationToken cancellationToken)
             {
-                IPaginate<UserCart> UserCarts = await _UserCartDal.GetListAsync(index: request.PageRequest.Page,
+                IPaginate<UserCart> UserCarts = await _unitOfWork.UserCartDal.GetListAsync(index: request.PageRequest.Page,
                                                                              size: request.PageRequest.PageSize,
                                                                              include: x => x.Include(c => c.User));
                 UserCartListModel mappedUserCartListModel = _mapper.Map<UserCartListModel>(UserCarts);

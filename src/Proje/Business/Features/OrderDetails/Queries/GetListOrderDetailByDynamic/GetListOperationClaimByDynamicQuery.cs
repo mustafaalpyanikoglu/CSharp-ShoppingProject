@@ -4,7 +4,7 @@ using Core.Application.Pipelines.Authorization;
 using Core.Application.Requests;
 using Core.Persistence.Dynamic;
 using Core.Persistence.Paging;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -21,18 +21,18 @@ namespace Business.Features.OrderDetailDetails.Queries.GetListOrderDetailDetailB
 
         public class GetListOrderDetailByDynamicQueryHandler : IRequestHandler<GetListOrderDetailByDynamicQuery, OrderDetailListModel>
         {
-            private readonly IOrderDetailDal _OrderDetailDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
 
-            public GetListOrderDetailByDynamicQueryHandler(IOrderDetailDal OrderDetailDal, IMapper mapper)
+            public GetListOrderDetailByDynamicQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
             {
-                _OrderDetailDal = OrderDetailDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
             }
 
             public async Task<OrderDetailListModel> Handle(GetListOrderDetailByDynamicQuery request, CancellationToken cancellationToken)
             {
-                IPaginate<OrderDetail> OrderDetails = await _OrderDetailDal.GetListByDynamicAsync(
+                IPaginate<OrderDetail> OrderDetails = await _unitOfWork.OrderDetailDal.GetListByDynamicAsync(
                                       request.Dynamic, 
                                       include: c => c.Include(c => c.Product)
                                                     .Include(c => c.Product.Category)

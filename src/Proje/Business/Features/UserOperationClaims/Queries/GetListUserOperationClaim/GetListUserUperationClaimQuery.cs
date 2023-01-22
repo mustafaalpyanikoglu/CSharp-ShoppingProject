@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using Business.Features.UserOperationClaims.Models;
-using Business.Features.UserOperationClaims.Rules;
 using Core.Application.Pipelines.Authorization;
 using Core.Application.Requests;
 using Core.Persistence.Paging;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -20,20 +19,18 @@ namespace Business.Features.UserOperationClaims.Queries.GetListUserOperationClai
 
         public class GetListUserUperationClaimQueryHandler : IRequestHandler<GetListUserUperationClaimQuery, UserOperationClaimListModel>
         {
-            private readonly IUserOperationClaimDal _userOperationClaimDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
-            private readonly UserOperationClaimBusinessRules _userOperationClaimBusinessRules;
 
-            public GetListUserUperationClaimQueryHandler(IUserOperationClaimDal userOperationClaimDal, IMapper mapper, UserOperationClaimBusinessRules userOperationClaimBusinessRules)
+            public GetListUserUperationClaimQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
             {
-                _userOperationClaimDal = userOperationClaimDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
-                _userOperationClaimBusinessRules = userOperationClaimBusinessRules;
             }
 
             public async Task<UserOperationClaimListModel> Handle(GetListUserUperationClaimQuery request, CancellationToken cancellationToken)
             {
-                IPaginate<UserOperationClaim> userOperationClaims = await _userOperationClaimDal.GetListAsync(
+                IPaginate<UserOperationClaim> userOperationClaims = await _unitOfWork.UserOperationClaimDal.GetListAsync(
                     include:c => c.Include(c => c.User).Include(c => c.OperationClaim),
                     index: request.PageRequest.Page,
                     size: request.PageRequest.PageSize);

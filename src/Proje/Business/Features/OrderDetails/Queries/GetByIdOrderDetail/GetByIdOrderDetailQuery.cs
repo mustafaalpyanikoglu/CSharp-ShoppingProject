@@ -3,6 +3,7 @@ using Business.Features.OrderDetails.Dtos;
 using Business.Features.OrderDetails.Rules;
 using Core.Application.Pipelines.Authorization;
 using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -18,13 +19,13 @@ namespace Business.Features.OrderDetails.Queries.GetByIdOrderDetail
 
         public class GetByIdOrderDetailQueryHandler : IRequestHandler<GetByIdOrderDetailQuery, OrderDetailDto>
         {
-            private readonly IOrderDetailDal _orderDetailDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
             private readonly OrderDetailBusinessRules _orderDetailBusinessRules;
 
-            public GetByIdOrderDetailQueryHandler(IOrderDetailDal orderDetailDal, IMapper mapper, OrderDetailBusinessRules orderDetailBusinessRules)
+            public GetByIdOrderDetailQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, OrderDetailBusinessRules orderDetailBusinessRules)
             {
-                _orderDetailDal = orderDetailDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
                 _orderDetailBusinessRules = orderDetailBusinessRules;
             }
@@ -33,7 +34,7 @@ namespace Business.Features.OrderDetails.Queries.GetByIdOrderDetail
             {
                 await _orderDetailBusinessRules.OrderDetailIdShouldExistWhenSelected(request.Id);
 
-                OrderDetail? OrderDetail = await _orderDetailDal.GetAsync(
+                OrderDetail? OrderDetail = await _unitOfWork.OrderDetailDal.GetAsync(
                     m => m.Id == request.Id,
                     include: c => c.Include(c => c.Product)
                                    .Include(c => c.Product.Category)

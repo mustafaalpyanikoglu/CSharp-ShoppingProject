@@ -5,6 +5,7 @@ using Core.Application.Requests;
 using Core.Persistence.Dynamic;
 using Core.Persistence.Paging;
 using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using static Business.Features.Categories.Constants.OperationClaims;
@@ -21,18 +22,18 @@ namespace Business.Features.Categories.Queries.GetListCategoryByDynamic
 
         public class GetListCategoryByDynamicQueryHandler : IRequestHandler<GetListCategoryByDynamicQuery, CategoryListModel>
         {
-            private readonly ICategoryDal _CategoryDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
 
-            public GetListCategoryByDynamicQueryHandler(ICategoryDal CategoryDal, IMapper mapper)
+            public GetListCategoryByDynamicQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
             {
-                _CategoryDal = CategoryDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
             }
 
             public async Task<CategoryListModel> Handle(GetListCategoryByDynamicQuery request, CancellationToken cancellationToken)
             {
-                IPaginate<Category> Categorys = await _CategoryDal.GetListByDynamicAsync(
+                IPaginate<Category> Categorys = await _unitOfWork.CategoryDal.GetListByDynamicAsync(
                                       request.Dynamic,
                                       null,
                                       request.PageRequest.Page,

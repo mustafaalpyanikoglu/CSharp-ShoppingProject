@@ -5,7 +5,7 @@ using Business.Features.Orders.Rules;
 using Business.Services.PurseService;
 using Core.Application.Pipelines.Authorization;
 using Core.Persistence.Paging;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -23,26 +23,18 @@ namespace Business.Features.Orders.Commands.ConfirmOrder
         public class ConfirmOrderCommandHandler : IRequestHandler<ConfirmOrderCommand, ConfirmOrderDto>
         {
             private readonly IMapper _mapper;
-            private readonly IUserCartDal _userCartDal;
-            private readonly IPurseDal _purseDal;
-            private readonly IOrderDal _orderDal;
-            private readonly IOrderDetailDal _orderDetailDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IPurseService _purseService;
-            private readonly IProductDal _productDal;
             private readonly OrderBusinessRules _orderBusinessRules;
             private readonly OrderDetailBusinessRules _orderDetailBusinessRules;
 
-            public ConfirmOrderCommandHandler(IMapper mapper, IUserCartDal userCartDal, IPurseDal purseDal, 
-                IOrderDal orderDal, IOrderDetailDal orderDetailDal, IPurseService purseService, 
-                IProductDal productDal, OrderBusinessRules orderBusinessRules, OrderDetailBusinessRules orderDetailBusinessRules)
+            public ConfirmOrderCommandHandler(IMapper mapper, IUnitOfWork unitOfWork, 
+                IPurseService purseService, OrderBusinessRules orderBusinessRules, 
+                OrderDetailBusinessRules orderDetailBusinessRules)
             {
                 _mapper = mapper;
-                _userCartDal = userCartDal;
-                _purseDal = purseDal;
-                _orderDal = orderDal;
-                _orderDetailDal = orderDetailDal;
+                _unitOfWork = unitOfWork;
                 _purseService = purseService;
-                _productDal = productDal;
                 _orderBusinessRules = orderBusinessRules;
                 _orderDetailBusinessRules = orderDetailBusinessRules;
             }
@@ -53,12 +45,12 @@ namespace Business.Features.Orders.Commands.ConfirmOrder
                 await _orderBusinessRules.OrderStatusMustBeFalse(order.Status);
                 await _orderDetailBusinessRules.IsThereAnyProductInTheCart(order.Id);
 
-                UserCart? userCart = await _userCartDal.GetAsync(u => u.Id == order.UserCartId);
-                Purse? purse = await _purseDal.GetAsync(p => p.UserId == userCart.UserId);
+                UserCart? userCart = await _unitOfWork.UserCartDal.GetAsync(u => u.Id == order.UserCartId);
+                Purse? purse = await _unitOfWork.PurseDal.GetAsync(p => p.UserId == userCart.UserId);
                 
                 float totalPrice = 0;
 
-                IPaginate<OrderDetail> orderDetails = await _orderDetailDal.GetListAsync(
+                IPaginate<OrderDetail> orderDetails = await _unitOfWork.OrderDetailDal.GetListAsync(
                     o => o.OrderId == request.OrderId,
                     include: c => c.Include(c => c.Product)
                 );
@@ -78,7 +70,7 @@ namespace Business.Features.Orders.Commands.ConfirmOrder
                         }
                     }
                 }
-                _productDal.UpdateRange(products); //alınan ürünler toplu bir şekilde güncellenir
+                _unitOfWork.ProductDal.UpdateRange(products); //alınan ürünler toplu bir şekilde güncellenir
 
                 await _purseService.SpendMoney(purse,totalPrice);
 
@@ -88,9 +80,12 @@ namespace Business.Features.Orders.Commands.ConfirmOrder
                 order.OrderNumber = order.OrderNumber;
                 order.UserCartId = order.UserCartId;
 
-                Order updatedOrder = await _orderDal.UpdateAsync(order); //sipariş durumu onaylanır
+                Order updatedOrder = await _unitOfWork.OrderDal.UpdateAsync(order); //sipariş durumu onaylanır
                 ConfirmOrderDto confirmOrderDto = _mapper.Map<ConfirmOrderDto>(updatedOrder);
                 confirmOrderDto.TotalPrice = totalPrice;
+
+                _unitOfWork.SaveChanges();
+                await _unitOfWork.SaveChangesAsync();
 
                 return confirmOrderDto;
             }

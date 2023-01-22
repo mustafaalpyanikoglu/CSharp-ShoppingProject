@@ -7,6 +7,7 @@ using Entities.Concrete;
 using Core.Application.Pipelines.Authorization;
 using static Business.Features.OperationClaims.Constants.OperationClaims;
 using static Entities.Constants.OperationClaims;
+using DataAccess.Concrete.Contexts;
 
 namespace Business.Features.OperationClaims.Commands.UpdateOperationClaim
 {
@@ -20,13 +21,13 @@ namespace Business.Features.OperationClaims.Commands.UpdateOperationClaim
 
         public class UpdateOperationClaimCommandHandler : IRequestHandler<UpdateOperationClaimCommand, UpdatedOperationClaimDto>
         {
-            private readonly IOperationClaimDal _operationClaimDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
             private readonly OperationClaimBusinessRules _operationClaimBusinessRules;
 
-            public UpdateOperationClaimCommandHandler(IOperationClaimDal operationClaimDal, IMapper mapper, OperationClaimBusinessRules operationClaimBusinessRules)
+            public UpdateOperationClaimCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, OperationClaimBusinessRules operationClaimBusinessRules)
             {
-                _operationClaimDal = operationClaimDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
                 _operationClaimBusinessRules = operationClaimBusinessRules;
             }
@@ -37,8 +38,10 @@ namespace Business.Features.OperationClaims.Commands.UpdateOperationClaim
                 await _operationClaimBusinessRules.OperationClaimNameShouldBeNotExists(request.Name);
 
                 OperationClaim mappedOperationClaim = _mapper.Map<OperationClaim>(request);
-                OperationClaim updatedOperationClaim = await _operationClaimDal.UpdateAsync(mappedOperationClaim);
+                OperationClaim updatedOperationClaim = await _unitOfWork.OperationClaimDal.UpdateAsync(mappedOperationClaim);
                 UpdatedOperationClaimDto updateOperationClaimDto = _mapper.Map<UpdatedOperationClaimDto>(updatedOperationClaim);
+
+                await _unitOfWork.SaveChangesAsync();
 
                 return updateOperationClaimDto;
             }

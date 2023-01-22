@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
 using Business.Features.UserCarts.Dtos;
 using Business.Features.UserCarts.Rules;
-using Business.Features.Users.Rules;
 using Core.Application.Pipelines.Authorization;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using static Business.Features.UserCarts.Constants.OperationClaims;
@@ -20,13 +19,13 @@ namespace Business.Features.UserCarts.Commands.DeleteUserCart
         public class DeleteUserCartCommandHandler : IRequestHandler<DeleteUserCartCommand, DeletedUserCartDto>
         {
             private readonly IMapper _mapper;
-            private readonly IUserCartDal _userCartDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly UserCartBusinessRules _userCartBusinessRules;
 
-            public DeleteUserCartCommandHandler(IMapper mapper, IUserCartDal userCartDal, UserCartBusinessRules userCartBusinessRules)
+            public DeleteUserCartCommandHandler(IMapper mapper, IUnitOfWork unitOfWork, UserCartBusinessRules userCartBusinessRules)
             {
                 _mapper = mapper;
-                _userCartDal = userCartDal;
+                _unitOfWork = unitOfWork;
                 _userCartBusinessRules = userCartBusinessRules;
             }
 
@@ -35,8 +34,10 @@ namespace Business.Features.UserCarts.Commands.DeleteUserCart
                 await _userCartBusinessRules.UserCartIdShouldExistWhenSelected(request.Id);
 
                 UserCart mappedUserCart = _mapper.Map<UserCart>(request);
-                UserCart DeletedUserCart = await _userCartDal.DeleteAsync(mappedUserCart);
+                UserCart DeletedUserCart = await _unitOfWork.UserCartDal.DeleteAsync(mappedUserCart);
                 DeletedUserCartDto DeleteUserCartDto = _mapper.Map<DeletedUserCartDto>(DeletedUserCart);
+
+                await _unitOfWork.SaveChangesAsync();
 
                 return DeleteUserCartDto;
             }

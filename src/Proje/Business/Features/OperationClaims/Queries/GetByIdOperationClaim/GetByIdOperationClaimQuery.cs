@@ -2,7 +2,7 @@
 using Business.Features.OperationClaims.Dtos;
 using Business.Features.OperationClaims.Rules;
 using Core.Application.Pipelines.Authorization;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using static Business.Features.OperationClaims.Constants.OperationClaims;
@@ -17,13 +17,13 @@ namespace Business.Features.OperationClaims.Queries.GetByIdOperationClaim
 
         public class GetByIdOperationClaimQueryHandler : IRequestHandler<GetByIdOperationClaimQuery, OperationClaimDto>
         {
-            private readonly IOperationClaimDal _operationClaimDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
             private readonly OperationClaimBusinessRules _operationClaimBusinessRules;
 
-            public GetByIdOperationClaimQueryHandler(IOperationClaimDal operationClaimDal, IMapper mapper, OperationClaimBusinessRules operationClaimBusinessRules)
+            public GetByIdOperationClaimQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, OperationClaimBusinessRules operationClaimBusinessRules)
             {
-                _operationClaimDal = operationClaimDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
                 _operationClaimBusinessRules = operationClaimBusinessRules;
             }
@@ -32,7 +32,7 @@ namespace Business.Features.OperationClaims.Queries.GetByIdOperationClaim
             {
                 await _operationClaimBusinessRules.OperationClaimIdShouldExistWhenSelected(request.Id);
 
-                OperationClaim? operationClaim = await _operationClaimDal.GetAsync(m => m.Id == request.Id);
+                OperationClaim? operationClaim = await _unitOfWork.OperationClaimDal.GetAsync(m => m.Id == request.Id);
                 OperationClaimDto operationClaimDto = _mapper.Map<OperationClaimDto>(operationClaim);
 
                 return operationClaimDto;
