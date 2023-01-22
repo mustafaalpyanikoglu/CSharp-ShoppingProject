@@ -3,6 +3,7 @@ using Business.Features.Purses.Dtos;
 using Business.Features.Purses.Rules;
 using Core.Application.Pipelines.Authorization;
 using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using static Business.Features.Purses.Constants.OperationClaims;
@@ -20,13 +21,14 @@ namespace Business.Features.Purses.Commands.UpdatePurseMoney
         public class UpdatePurseMoneyCommandHandler : IRequestHandler<UpdatePurseMoneyCommand, UpdatedPurseMoneyDto>
         {
             private readonly IMapper _mapper;
-            private readonly IPurseDal _purseDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly PurseBusinessRules _purseBusinessRules;
 
-            public UpdatePurseMoneyCommandHandler(IMapper mapper, IPurseDal purseDal, PurseBusinessRules purseBusinessRules)
+            public UpdatePurseMoneyCommandHandler(IMapper mapper, IUnitOfWork unitOfWork, 
+                PurseBusinessRules purseBusinessRules)
             {
                 _mapper = mapper;
-                _purseDal = purseDal;
+                _unitOfWork = unitOfWork;
                 _purseBusinessRules = purseBusinessRules;
             }
 
@@ -35,8 +37,10 @@ namespace Business.Features.Purses.Commands.UpdatePurseMoney
                 await _purseBusinessRules.PurseIdShouldExistWhenSelected(request.Id);
 
                 Purse mappedPurse = _mapper.Map<Purse>(request);
-                Purse UpdatedPurse = await _purseDal.UpdateAsync(mappedPurse);
+                Purse UpdatedPurse = await _unitOfWork.PurseDal.UpdateAsync(mappedPurse);
                 UpdatedPurseMoneyDto UpdatePurseDto = _mapper.Map<UpdatedPurseMoneyDto>(UpdatedPurse);
+
+                await _unitOfWork.SaveChangesAsync();
 
                 return UpdatePurseDto;
             }

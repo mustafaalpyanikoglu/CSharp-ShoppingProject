@@ -7,6 +7,7 @@ using Core.Application.Pipelines.Authorization;
 using Core.Application.Requests;
 using Core.Persistence.Paging;
 using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -25,15 +26,17 @@ namespace Business.Features.OrderDetailDetails.Queries.GetListPastOrderDetailDet
         public class GetListPastOrderDetailQueryHandler : IRequestHandler<GetListPastOrderDetailQuery, UserPastOrderListModel>
         {
             private readonly IMapper _mapper;
-            private readonly IOrderDetailDal _orderDetailDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IOrderDetailService _orderDetailService;
             private readonly UserBusinessRules _userBusinessRules;
             private readonly OrderDetailBusinessRules _orderDetailBusinessRules;
 
-            public GetListPastOrderDetailQueryHandler(IMapper mapper, IOrderDetailDal orderDetailDal, IOrderDetailService orderDetailService, UserBusinessRules userBusinessRules, OrderDetailBusinessRules orderDetailBusinessRules)
+            public GetListPastOrderDetailQueryHandler(IMapper mapper, IUnitOfWork unitOfWork, 
+                IOrderDetailService orderDetailService, UserBusinessRules userBusinessRules, 
+                OrderDetailBusinessRules orderDetailBusinessRules)
             {
                 _mapper = mapper;
-                _orderDetailDal = orderDetailDal;
+                _unitOfWork = unitOfWork;
                 _orderDetailService = orderDetailService;
                 _userBusinessRules = userBusinessRules;
                 _orderDetailBusinessRules = orderDetailBusinessRules;
@@ -43,12 +46,12 @@ namespace Business.Features.OrderDetailDetails.Queries.GetListPastOrderDetailDet
             {
                 await _userBusinessRules.UserIdMustBeAvailable(request.UserId);
 
-                OrderDetail? orderDetail = await _orderDetailDal.GetAsync(o => o.Order.UserCart.UserId == request.UserId, include: c => c.Include(c => c.Order));
+                OrderDetail? orderDetail = await _unitOfWork.OrderDetailDal.GetAsync(o => o.Order.UserCart.UserId == request.UserId, include: c => c.Include(c => c.Order));
                 await _orderDetailBusinessRules.OrderDetailIdShouldExistWhenSelected(orderDetail.Id);
 
                 float totalPrice = await _orderDetailService.AmountUserCart(orderDetail.OrderId);
 
-                IPaginate<OrderDetail> OrderDetails = await _orderDetailDal.GetListAsync(
+                IPaginate<OrderDetail> OrderDetails = await _unitOfWork.OrderDetailDal.GetListAsync(
                     o => o.Order.Status == true && o.Order.UserCart.User.Id == request.UserId,
                     include: c => c.Include(c => c.Product)
                                    .Include(c => c.Product.Category)

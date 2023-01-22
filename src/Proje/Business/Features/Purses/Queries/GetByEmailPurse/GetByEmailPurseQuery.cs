@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
 using Business.Features.Purses.Dtos;
-using Business.Features.Purses.Rules;
 using Business.Features.Users.Rules;
 using Core.Application.Pipelines.Authorization;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -20,15 +19,13 @@ namespace Business.Features.Purses.Queries.GetByIdPurse
 
         public class GetByNamePurseQueryHandler : IRequestHandler<GetByEmailPurseQuery, PurseDto>
         {
-            private readonly IPurseDal _purseDal;
-            private readonly IUserDal _userDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
             private readonly UserBusinessRules _userBusinessRules;
 
-            public GetByNamePurseQueryHandler(IPurseDal purseDal, IUserDal userDal, IMapper mapper, UserBusinessRules userBusinessRules)
+            public GetByNamePurseQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, UserBusinessRules userBusinessRules)
             {
-                _purseDal = purseDal;
-                _userDal = userDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
                 _userBusinessRules = userBusinessRules;
             }
@@ -37,8 +34,8 @@ namespace Business.Features.Purses.Queries.GetByIdPurse
             {
                 await _userBusinessRules.UserEmailMustBeAvailable(request.Email);
 
-                User? user = await _userDal.GetAsync(u => u.Email == request.Email);
-                Purse? purse = await _purseDal.GetAsync(m => m.User.Email == request.Email,
+                User? user = await _unitOfWork.UserDal.GetAsync(u => u.Email == request.Email);
+                Purse? purse = await _unitOfWork.PurseDal.GetAsync(m => m.User.Email == request.Email,
                                                         include: x => x.Include(c => c.User));
                 PurseDto PurseDto = _mapper.Map<PurseDto>(purse);
 

@@ -2,7 +2,7 @@
 using Business.Features.UserOperationClaims.Dtos;
 using Business.Features.UserOperationClaims.Rules;
 using Core.Application.Pipelines.Authorization;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using static Business.Features.UserOperationClaims.Constants.OperationClaims;
@@ -18,13 +18,14 @@ namespace Business.Features.UserOperationClaims.Commands.DeleteUserOperationClai
 
         public class DeleteUserOperationClaimCommandHandler : IRequestHandler<DeleteUserOperationClaimCommand, DeleteUserOperationClaimDto>
         {
-            private readonly IUserOperationClaimDal _userOperationClaimDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
             private readonly UserOperationClaimBusinessRules _userOperationClaimBusinessRules;
 
-            public DeleteUserOperationClaimCommandHandler(IUserOperationClaimDal userOperationClaimDal, IMapper mapper, UserOperationClaimBusinessRules userOperationClaimBusinessRules)
+            public DeleteUserOperationClaimCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, 
+                UserOperationClaimBusinessRules userOperationClaimBusinessRules)
             {
-                _userOperationClaimDal = userOperationClaimDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
                 _userOperationClaimBusinessRules = userOperationClaimBusinessRules;
             }
@@ -34,7 +35,7 @@ namespace Business.Features.UserOperationClaims.Commands.DeleteUserOperationClai
                 await _userOperationClaimBusinessRules.UserOperationClaimIdMustBeAvailable(request.Id);
 
                 UserOperationClaim mappedUserOperationClaim = _mapper.Map<UserOperationClaim>(request);
-                UserOperationClaim deletedUserOperationClaim = await _userOperationClaimDal.DeleteAsync(mappedUserOperationClaim);
+                UserOperationClaim deletedUserOperationClaim = await _unitOfWork.UserOperationClaimDal.DeleteAsync(mappedUserOperationClaim);
                 DeleteUserOperationClaimDto deleteUserOperationClaimDto = _mapper.Map<DeleteUserOperationClaimDto>(deletedUserOperationClaim);
 
                 return deleteUserOperationClaimDto;

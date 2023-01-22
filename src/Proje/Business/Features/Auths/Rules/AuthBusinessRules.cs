@@ -2,19 +2,19 @@ using Business.Features.Auths.Constants;
 using Core.Application.Rules;
 using Core.CrossCuttingConcerns.Exceptions;
 using Core.Security.Hashing;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 
 namespace Application.Features.Auths.Rules;
 
 public class AuthBusinessRules : BaseBusinessRules
 {
-    private readonly IUserDal _userdal;
-
-    public AuthBusinessRules(IUserDal userdal)
+    private readonly IUnitOfWork _unitOfWork;
+    public AuthBusinessRules(IUnitOfWork unitOfWork)
     {
-        _userdal = userdal;
+        _unitOfWork = unitOfWork;
     }
+
     public Task UserShouldBeExists(User? user)
     {
         if (user == null) throw new BusinessException(AuthMessages.UserDontExists);
@@ -28,19 +28,19 @@ public class AuthBusinessRules : BaseBusinessRules
 
     public async Task UserEmailShouldBeNotExists(string email)
     {
-        User? user = await _userdal.GetAsync(u => u.Email == email);
+        User? user = await _unitOfWork.UserDal.GetAsync(u => u.Email == email);
         if (user != null) throw new BusinessException(AuthMessages.UserEmailAlreadyExists);
     }
 
     public async Task UserEmailMustBeAvailable(string email)
     {
-        User? user = await _userdal.GetAsync(u => u.Email == email);
+        User? user = await _unitOfWork.UserDal.GetAsync(u => u.Email == email);
         if (user == null) throw new BusinessException(AuthMessages.UserDontExists);
     }
 
     public async Task UserPasswordShouldBeMatch(int id, string password)
     {
-        User? user = await _userdal.GetAsync(u => u.Id == id);
+        User? user = await _unitOfWork.UserDal.GetAsync(u => u.Id == id);
         if (!HashingHelper.VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
             throw new BusinessException(AuthMessages.PasswordDontMatch);
     }

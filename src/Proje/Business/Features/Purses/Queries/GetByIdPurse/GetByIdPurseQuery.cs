@@ -2,7 +2,7 @@
 using Business.Features.Purses.Dtos;
 using Business.Features.Purses.Rules;
 using Core.Application.Pipelines.Authorization;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -19,13 +19,13 @@ namespace Business.Features.Purses.Queries.GetByIdPurse
 
         public class GetByIdPurseQueryHandler : IRequestHandler<GetByIdPurseQuery, PurseDto>
         {
-            private readonly IPurseDal _purseDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
             private readonly PurseBusinessRules _purseBusinessRules;
 
-            public GetByIdPurseQueryHandler(IPurseDal purseDal, IMapper mapper, PurseBusinessRules purseBusinessRules)
+            public GetByIdPurseQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, PurseBusinessRules purseBusinessRules)
             {
-                _purseDal = purseDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
                 _purseBusinessRules = purseBusinessRules;
             }
@@ -34,7 +34,7 @@ namespace Business.Features.Purses.Queries.GetByIdPurse
             {
                 await _purseBusinessRules.PurseIdShouldExistWhenSelected(request.Id);
 
-                Purse? purse = await _purseDal.GetAsync(m => m.Id == request.Id,
+                Purse? purse = await _unitOfWork.PurseDal.GetAsync(m => m.Id == request.Id,
                                                               include: x => x.Include(c => c.User));
                 PurseDto PurseDto = _mapper.Map<PurseDto>(purse);
 

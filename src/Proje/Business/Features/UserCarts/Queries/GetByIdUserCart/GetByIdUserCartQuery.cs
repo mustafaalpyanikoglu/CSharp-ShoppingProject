@@ -2,7 +2,7 @@
 using Business.Features.UserCarts.Dtos;
 using Business.Features.UserCarts.Rules;
 using Core.Application.Pipelines.Authorization;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -19,22 +19,22 @@ namespace Business.Features.UserCarts.Queries.GetByIdUserCart
 
         public class GetByIdUserCartQueryHandler : IRequestHandler<GetByIdUserCartQuery, UserCartDto>
         {
-            private readonly IUserCartDal _UserCartDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
             private readonly UserCartBusinessRules _UserCartBusinessRules;
 
-            public GetByIdUserCartQueryHandler(IUserCartDal UserCartDal, IMapper mapper, UserCartBusinessRules UserCartBusinessRules)
+            public GetByIdUserCartQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, UserCartBusinessRules userCartBusinessRules)
             {
-                _UserCartDal = UserCartDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
-                _UserCartBusinessRules = UserCartBusinessRules;
+                _UserCartBusinessRules = userCartBusinessRules;
             }
 
             public async Task<UserCartDto> Handle(GetByIdUserCartQuery request, CancellationToken cancellationToken)
             {
                 await _UserCartBusinessRules.UserCartIdShouldExistWhenSelected(request.Id);
 
-                UserCart? UserCart = await _UserCartDal.GetAsync(m => m.Id == request.Id,
+                UserCart? UserCart = await _unitOfWork.UserCartDal.GetAsync(m => m.Id == request.Id,
                                                               include: x => x.Include(c => c.User));
                 UserCartDto UserCartDto = _mapper.Map<UserCartDto>(UserCart);
 

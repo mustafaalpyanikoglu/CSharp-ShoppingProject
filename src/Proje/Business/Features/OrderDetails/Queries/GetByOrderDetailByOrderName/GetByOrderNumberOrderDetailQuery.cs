@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Business.Features.OrderDetails.Dtos;
 using Business.Features.OrderDetails.Models;
 using Business.Features.OrderDetails.Rules;
 using Business.Features.Orders.Rules;
@@ -7,7 +6,7 @@ using Business.Services.OrderDetailService;
 using Core.Application.Pipelines.Authorization;
 using Core.Application.Requests;
 using Core.Persistence.Paging;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -24,31 +23,32 @@ namespace Business.Features.OrderDetails.Queries.GetByOrderDetailByOrderName
 
         public class GetListOrderDetailByOrderNameQueryHandler : IRequestHandler<GetListOrderDetailByOrderNameQuery, OrderDetailListByUserCartModel>
         {
-            private readonly IOrderDetailDal _orderDetailDal;
             private readonly IMapper _mapper;
+            private readonly IOrderDetailService _orderDetailService;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly OrderBusinessRules _orderBusinessRules;
             private readonly OrderDetailBusinessRules _orderDetailBusinessRules;
-            private readonly IOrderDetailService _orderDetailService;
 
-            public GetListOrderDetailByOrderNameQueryHandler(IOrderDetailDal orderDetailDal, IMapper mapper, OrderBusinessRules orderBusinessRules, OrderDetailBusinessRules orderDetailBusinessRules, IOrderDetailService orderDetailService)
+            public GetListOrderDetailByOrderNameQueryHandler(IMapper mapper, IOrderDetailService orderDetailService, 
+                IUnitOfWork unitOfWork, OrderBusinessRules orderBusinessRules, OrderDetailBusinessRules orderDetailBusinessRules)
             {
-                _orderDetailDal = orderDetailDal;
                 _mapper = mapper;
+                _orderDetailService = orderDetailService;
+                _unitOfWork = unitOfWork;
                 _orderBusinessRules = orderBusinessRules;
                 _orderDetailBusinessRules = orderDetailBusinessRules;
-                _orderDetailService = orderDetailService;
             }
 
             public async Task<OrderDetailListByUserCartModel> Handle(GetListOrderDetailByOrderNameQuery request, CancellationToken cancellationToken)
             {
                 await _orderBusinessRules.OrderNumberShouldExistWhenSelected(request.OrderNumber);
 
-                OrderDetail? orderDetail = await _orderDetailDal.GetAsync(o => o.Order.OrderNumber == request.OrderNumber, include: c => c.Include(c => c.Order));
+                OrderDetail? orderDetail = await _unitOfWork.OrderDetailDal.GetAsync(o => o.Order.OrderNumber == request.OrderNumber, include: c => c.Include(c => c.Order));
                 await _orderDetailBusinessRules.OrderDetailIdShouldExistWhenSelected(orderDetail.Id);
 
                 float totalPrice = await _orderDetailService.AmountUserCart(orderDetail.OrderId);
 
-                IPaginate<OrderDetail>? OrderDetail = await _orderDetailDal.GetListAsync(
+                IPaginate<OrderDetail>? OrderDetail = await _unitOfWork.OrderDetailDal.GetListAsync(
                     m => m.Order.OrderNumber == request.OrderNumber,
                     include: c => c.Include(c => c.Product)
                                    .Include(c => c.Product.Category)

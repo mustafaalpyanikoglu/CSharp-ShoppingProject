@@ -2,7 +2,7 @@
 using Business.Features.Users.Dtos;
 using Business.Features.Users.Rules;
 using Core.Application.Pipelines.Authorization;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using static Business.Features.Users.Constants.OperationClaims;
@@ -24,13 +24,13 @@ namespace Business.Features.Users.Command.UpdateUser
 
         public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, UpdatedUserDto>
         {
-            private readonly IUserDal _userDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
             private readonly UserBusinessRules _userBusinessRules;
 
-            public UpdateUserCommandHandler(IUserDal userDal, IMapper mapper, UserBusinessRules userBusinessRules)
+            public UpdateUserCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, UserBusinessRules userBusinessRules)
             {
-                _userDal = userDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
                 _userBusinessRules = userBusinessRules;
             }
@@ -41,12 +41,15 @@ namespace Business.Features.Users.Command.UpdateUser
 
                 User mappedUser = _mapper.Map<User>(request);
 
-                User? user = await _userDal.GetAsync(u => u.Id == request.Id);
+                User? user = await _unitOfWork.UserDal.GetAsync(u => u.Id == request.Id);
                 mappedUser.PasswordHash = user.PasswordHash;
                 mappedUser.PasswordSalt = user.PasswordSalt;
 
-                User updatedUser = await _userDal.UpdateAsync(mappedUser);
+                User updatedUser = await _unitOfWork.UserDal.UpdateAsync(mappedUser);
                 UpdatedUserDto updatedUserDto = _mapper.Map<UpdatedUserDto>(updatedUser);
+
+                await _unitOfWork.SaveChangesAsync();
+
                 return updatedUserDto;
             }
         }

@@ -2,7 +2,7 @@
 using Business.Features.Users.Dtos;
 using Business.Features.Users.Rules;
 using Core.Application.Pipelines.Authorization;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using static Business.Features.Users.Constants.OperationClaims;
@@ -18,14 +18,13 @@ namespace Business.Features.Users.Command.DeleteUser
 
         public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, DeletedUserDto>
         {
-            private readonly IUserDal _userDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
             private readonly UserBusinessRules _userBusinessRules;
 
-            public DeleteUserCommandHandler(IUserDal userDal, IMapper mapper,
-                                            UserBusinessRules userBusinessRules)
+            public DeleteUserCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, UserBusinessRules userBusinessRules)
             {
-                _userDal = userDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
                 _userBusinessRules = userBusinessRules;
             }
@@ -36,8 +35,11 @@ namespace Business.Features.Users.Command.DeleteUser
 
                 User mappedUser = _mapper.Map<User>(request);
                 mappedUser.Status = false;
-                User deletedUser = await _userDal.UpdateAsync(mappedUser);
+                User deletedUser = await _unitOfWork.UserDal.UpdateAsync(mappedUser);
                 DeletedUserDto deletedUserDto = _mapper.Map<DeletedUserDto>(deletedUser);
+
+                await _unitOfWork.SaveChangesAsync();
+
                 return deletedUserDto;
             }
         }

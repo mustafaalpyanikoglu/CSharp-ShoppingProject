@@ -6,6 +6,7 @@ using Core.Application.Pipelines.Authorization;
 using Core.Application.Requests;
 using Core.Persistence.Paging;
 using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -21,18 +22,18 @@ namespace Business.Features.Orders.Queries.GetListOrder
 
         public class GetListOrderQueryHanlder : IRequestHandler<GetListOrderQuery, OrderListModel>
         {
-            private readonly IOrderDal _OrderDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
 
-            public GetListOrderQueryHanlder(IOrderDal OrderDal, IMapper mapper)
+            public GetListOrderQueryHanlder(IUnitOfWork unitOfWork, IMapper mapper)
             {
-                _OrderDal = OrderDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
             }
 
             public async Task<OrderListModel> Handle(GetListOrderQuery request, CancellationToken cancellationToken)
             {
-                IPaginate<Order> Orders = await _OrderDal.GetListAsync(index: request.PageRequest.Page,
+                IPaginate<Order> Orders = await _unitOfWork.OrderDal.GetListAsync(index: request.PageRequest.Page,
                                                                        size: request.PageRequest.PageSize,
                                                                        include: x => x.Include(c => c.UserCart.User));
                 OrderListModel mappedOrderListModel = _mapper.Map<OrderListModel>(Orders);

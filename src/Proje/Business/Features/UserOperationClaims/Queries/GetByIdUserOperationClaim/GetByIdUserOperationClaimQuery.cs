@@ -2,7 +2,7 @@
 using Business.Features.UserOperationClaims.Dtos;
 using Business.Features.UserOperationClaims.Rules;
 using Core.Application.Pipelines.Authorization;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -18,13 +18,14 @@ namespace Business.Features.UserOperationClaims.Queries.GetByIdUserOperationClai
 
         public class GetByIdUserOperationClaimQueryHanlder : IRequestHandler<GetByIdUserOperationClaimQuery, UserOperationClaimDto>
         {
-            private readonly IUserOperationClaimDal _userOperationClaimDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
             private readonly UserOperationClaimBusinessRules _userOperationClaimBusinessRules;
 
-            public GetByIdUserOperationClaimQueryHanlder(IUserOperationClaimDal userOperationClaimDal, IMapper mapper, UserOperationClaimBusinessRules userOperationClaimBusinessRules)
+            public GetByIdUserOperationClaimQueryHanlder(IUnitOfWork unitOfWork, IMapper mapper, 
+                UserOperationClaimBusinessRules userOperationClaimBusinessRules)
             {
-                _userOperationClaimDal = userOperationClaimDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
                 _userOperationClaimBusinessRules = userOperationClaimBusinessRules;
             }
@@ -33,7 +34,7 @@ namespace Business.Features.UserOperationClaims.Queries.GetByIdUserOperationClai
             {
                 await _userOperationClaimBusinessRules.UserOperationClaimIdMustBeAvailable(request.Id);
 
-                UserOperationClaim? userOperationClaim = await _userOperationClaimDal.GetAsync(
+                UserOperationClaim? userOperationClaim = await _unitOfWork.UserOperationClaimDal.GetAsync(
                     u => u.Id == request.Id,
                     include: c => c.Include(c => c.User).Include(c => c.OperationClaim)
                     );

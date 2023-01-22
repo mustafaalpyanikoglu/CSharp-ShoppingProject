@@ -19,21 +19,18 @@ namespace Core.Persistence.Repositories
         public async Task<TEntity> AddAsync(TEntity entity)
         {
             Context.Entry(entity).State = EntityState.Added;
-            await Context.SaveChangesAsync();
             return entity;
         }
 
         public async Task<TEntity> DeleteAsync(TEntity entity)
         {
             Context.Entry(entity).State = EntityState.Deleted;
-            await Context.SaveChangesAsync();
             return entity;
         }
 
         public async Task<TEntity> UpdateAsync(TEntity entity)
         {
             Context.Entry(entity).State = EntityState.Modified;
-            await Context.SaveChangesAsync();
             return entity;
         }
 
@@ -49,7 +46,6 @@ namespace Core.Persistence.Repositories
         {
             using (Context)
             {
-
                 return filter == null ? Context.Set<TEntity>().ToList() : Context.Set<TEntity>().Where(filter).ToList();
             }
         }
@@ -79,27 +75,23 @@ namespace Core.Persistence.Repositories
         public TEntity Add(TEntity entity)
         {
             Context.Entry(entity).State = EntityState.Added;
-            Context.SaveChanges();
             return entity;
         }
 
         public TEntity Update(TEntity entity)
         {
             Context.Entry(entity).State = EntityState.Modified;
-            Context.SaveChanges();
             return entity;
         }
         public List<TEntity> UpdateRange(List<TEntity> entity)
         {
             Context.UpdateRange(entity);
-            Context.SaveChanges();
             return entity;
         }
 
         public TEntity Delete(TEntity entity)
         {
             Context.Entry(entity).State = EntityState.Deleted;
-            Context.SaveChanges();
             return entity;
         }
 
@@ -131,7 +123,6 @@ namespace Core.Persistence.Repositories
         public async Task<List<TEntity>> UpdateRangeAsync(List<TEntity> entityList)
         {
             Context.Entry(entityList).State = EntityState.Modified;
-            await Context.SaveChangesAsync();
             return entityList;
         }
     }

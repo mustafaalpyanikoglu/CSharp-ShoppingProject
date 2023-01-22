@@ -4,7 +4,7 @@ using Core.Application.Pipelines.Authorization;
 using Core.Application.Requests;
 using Core.Persistence.Dynamic;
 using Core.Persistence.Paging;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -21,18 +21,18 @@ namespace Business.Features.UserOperationClaims.Queries.GetListUserOperationClai
 
         public class GetListUserOperationClaimByDynamicQueryHandler : IRequestHandler<GetListUserOperationClaimByDynamicQuery, UserOperationClaimListModel>
         {
-            private readonly IUserOperationClaimDal _userOperationClaimDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
 
-            public GetListUserOperationClaimByDynamicQueryHandler(IUserOperationClaimDal userOperationClaimDal, IMapper mapper)
+            public GetListUserOperationClaimByDynamicQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
             {
-                _userOperationClaimDal = userOperationClaimDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
             }
 
             public async Task<UserOperationClaimListModel> Handle(GetListUserOperationClaimByDynamicQuery request, CancellationToken cancellationToken)
             {
-                IPaginate<UserOperationClaim> userOperationClaims = await _userOperationClaimDal.GetListByDynamicAsync(
+                IPaginate<UserOperationClaim> userOperationClaims = await _unitOfWork.UserOperationClaimDal.GetListByDynamicAsync(
                                       request.Dynamic,
                                       include: c => c.Include(c => c.User).Include(c => c.OperationClaim),
                                       request.PageRequest.Page,

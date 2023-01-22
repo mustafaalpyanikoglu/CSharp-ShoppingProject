@@ -2,7 +2,7 @@
 using Business.Features.UserOperationClaims.Dtos;
 using Business.Features.UserOperationClaims.Rules;
 using Core.Application.Pipelines.Authorization;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using static Business.Features.UserOperationClaims.Constants.OperationClaims;
@@ -18,13 +18,13 @@ namespace Business.Features.UserOperationClaims.Commands.CreateUserOperationClai
         public string[] Roles => new []{Admin,UserOperationClaimAdd}; 
         public class CreateUserOperationClaimCommandHanlder : IRequestHandler<CreateUserOperationClaimCommand, CreateUserOperationClaimDto>
         {
-            private readonly IUserOperationClaimDal _userOperationClaimDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
             private readonly UserOperationClaimBusinessRules _userOperationClaimBusinessRules;
 
-            public CreateUserOperationClaimCommandHanlder(IUserOperationClaimDal userOperationClaimDal, IMapper mapper, UserOperationClaimBusinessRules userOperationClaimBusinessRules)
+            public CreateUserOperationClaimCommandHanlder(IUnitOfWork unitOfWork, IMapper mapper, UserOperationClaimBusinessRules userOperationClaimBusinessRules)
             {
-                _userOperationClaimDal = userOperationClaimDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
                 _userOperationClaimBusinessRules = userOperationClaimBusinessRules;
             }
@@ -35,7 +35,7 @@ namespace Business.Features.UserOperationClaims.Commands.CreateUserOperationClai
                 await _userOperationClaimBusinessRules.OperationClaimIdMustBeAvailable(request.OperationClaimId);
 
                 UserOperationClaim mappedUserOperationClaim = _mapper.Map<UserOperationClaim>(request);
-                UserOperationClaim createdUserOperationClaim = await _userOperationClaimDal.AddAsync(mappedUserOperationClaim);
+                UserOperationClaim createdUserOperationClaim = await _unitOfWork.UserOperationClaimDal.AddAsync(mappedUserOperationClaim);
                 CreateUserOperationClaimDto createUserOperationClaimDto = _mapper.Map<CreateUserOperationClaimDto>(createdUserOperationClaim);
 
                 return createUserOperationClaimDto;

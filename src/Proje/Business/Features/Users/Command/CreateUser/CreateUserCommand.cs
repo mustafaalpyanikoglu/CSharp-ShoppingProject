@@ -3,7 +3,7 @@ using Business.Features.Users.Dtos;
 using Business.Features.Users.Rules;
 using Core.Application.Pipelines.Authorization;
 using Core.Security.Hashing;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using static Business.Features.Users.Constants.OperationClaims;
@@ -25,13 +25,13 @@ namespace Business.Features.Users.Command.CreateUser
 
         public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, CreatedUserDto>
         {
-            private readonly IUserDal _userDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
             private readonly UserBusinessRules _userBusinessRules;
 
-            public CreateUserCommandHandler(IUserDal userDal, IMapper mapper, UserBusinessRules userBusinessRules)
+            public CreateUserCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, UserBusinessRules userBusinessRules)
             {
-                _userDal = userDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
                 _userBusinessRules = userBusinessRules;
             }
@@ -48,8 +48,11 @@ namespace Business.Features.Users.Command.CreateUser
                 mappedUser.PasswordSalt = passwordSalt;
 
                 mappedUser.RegistrationDate = Convert.ToDateTime(DateTime.Now.ToString("F"));
-                User createdUser = await _userDal.AddAsync(mappedUser);
+                User createdUser = await _unitOfWork.UserDal.AddAsync(mappedUser);
                 CreatedUserDto createdUserDto = _mapper.Map<CreatedUserDto>(createdUser);
+
+                await _unitOfWork.SaveChangesAsync();
+
                 return createdUserDto;
 
             }

@@ -3,6 +3,7 @@ using Business.Features.Categories.Dtos;
 using Business.Features.Categorys.Rules;
 using Core.Application.Pipelines.Authorization;
 using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using static Business.Features.Categories.Constants.OperationClaims;
@@ -19,13 +20,13 @@ namespace Business.Features.Categories.Commands.UpdateCategory
 
         public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryCommand, UpdatedCategoryDto>
         {
-            private readonly ICategoryDal _categoryDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
             private readonly CategoryBusinessRules _categoryBusinessRules;
 
-            public UpdateCategoryCommandHandler(ICategoryDal categoryDal, IMapper mapper, CategoryBusinessRules categoryBusinessRules)
+            public UpdateCategoryCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, CategoryBusinessRules categoryBusinessRules)
             {
-                _categoryDal = categoryDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
                 _categoryBusinessRules = categoryBusinessRules;
             }
@@ -35,8 +36,10 @@ namespace Business.Features.Categories.Commands.UpdateCategory
                 await _categoryBusinessRules.CategoryIdShouldExistWhenSelected(request.Id);
 
                 Category mappedCategory = _mapper.Map<Category>(request);
-                Category UpdatedCategory = await _categoryDal.UpdateAsync(mappedCategory);
+                Category UpdatedCategory = await _unitOfWork.CategoryDal.UpdateAsync(mappedCategory);
                 UpdatedCategoryDto UpdateCategoryDto = _mapper.Map<UpdatedCategoryDto>(UpdatedCategory);
+
+                await _unitOfWork.SaveChangesAsync();
 
                 return UpdateCategoryDto;
             }

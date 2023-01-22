@@ -6,6 +6,7 @@ using Core.Application.Requests;
 using Core.Persistence.Dynamic;
 using Core.Persistence.Paging;
 using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -22,18 +23,18 @@ namespace Business.Features.Orders.Queries.GetListOrderByDynamic
 
         public class GetListOrderByDynamicQueryHandler : IRequestHandler<GetListOrderByDynamicQuery, OrderListModel>
         {
-            private readonly IOrderDal _OrderDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
 
-            public GetListOrderByDynamicQueryHandler(IOrderDal OrderDal, IMapper mapper)
+            public GetListOrderByDynamicQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
             {
-                _OrderDal = OrderDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
             }
 
             public async Task<OrderListModel> Handle(GetListOrderByDynamicQuery request, CancellationToken cancellationToken)
             {
-                IPaginate<Order> Orders = await _OrderDal.GetListByDynamicAsync(
+                IPaginate<Order> Orders = await _unitOfWork.OrderDal.GetListByDynamicAsync(
                                       request.Dynamic,
                                       include: x => x.Include(c => c.UserCart.User),
                                       request.PageRequest.Page,

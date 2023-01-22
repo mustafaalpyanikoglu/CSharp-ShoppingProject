@@ -5,6 +5,7 @@ using Core.Application.Requests;
 using Core.Persistence.Dynamic;
 using Core.Persistence.Paging;
 using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using static Business.Features.OperationClaims.Constants.OperationClaims;
@@ -20,18 +21,18 @@ namespace Business.Features.OperationClaims.Queries.GetListOperationClaimByDynam
 
         public class GetListOperationClaimByDynamicQueryHandler : IRequestHandler<GetListOperationClaimByDynamicQuery, OperationClaimListModel>
         {
-            private readonly IOperationClaimDal _operationClaimDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
 
-            public GetListOperationClaimByDynamicQueryHandler(IOperationClaimDal operationClaimDal, IMapper mapper)
+            public GetListOperationClaimByDynamicQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
             {
-                _operationClaimDal = operationClaimDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
             }
 
             public async Task<OperationClaimListModel> Handle(GetListOperationClaimByDynamicQuery request, CancellationToken cancellationToken)
             {
-                IPaginate<OperationClaim> operationClaims = await _operationClaimDal.GetListByDynamicAsync(
+                IPaginate<OperationClaim> operationClaims = await _unitOfWork.OperationClaimDal.GetListByDynamicAsync(
                                       request.Dynamic,
                                       null,
                                       request.PageRequest.Page,

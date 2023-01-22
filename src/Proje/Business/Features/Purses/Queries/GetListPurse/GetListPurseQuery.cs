@@ -3,7 +3,7 @@ using Business.Features.Purses.Models;
 using Core.Application.Pipelines.Authorization;
 using Core.Application.Requests;
 using Core.Persistence.Paging;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -20,18 +20,18 @@ namespace Business.Features.Purses.Queries.GetListPurse
 
         public class GetListPurseQueryHanlder : IRequestHandler<GetListPurseQuery, PurseListModel>
         {
-            private readonly IPurseDal _purseDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
 
-            public GetListPurseQueryHanlder(IPurseDal purseDal, IMapper mapper)
+            public GetListPurseQueryHanlder(IUnitOfWork unitOfWork, IMapper mapper)
             {
-                _purseDal = purseDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
             }
 
             public async Task<PurseListModel> Handle(GetListPurseQuery request, CancellationToken cancellationToken)
             {
-                IPaginate<Purse> Purses = await _purseDal.GetListAsync(index: request.PageRequest.Page,
+                IPaginate<Purse> Purses = await _unitOfWork.PurseDal.GetListAsync(index: request.PageRequest.Page,
                                                                              size: request.PageRequest.PageSize,
                                                                              include: x => x.Include(c => c.User));
                 PurseListModel mappedPurseListModel = _mapper.Map<PurseListModel>(Purses);
