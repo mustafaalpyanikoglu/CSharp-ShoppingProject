@@ -4,9 +4,9 @@ using Core.CrossCuttingConcerns.Exceptions;
 using Core.Utilities.Abstract;
 using Core.Utilities.Concrete;
 using Entities.Concrete;
-using DataAccess.Concrete.Contexts;
 using static Business.Features.OperationClaims.Constants.OperationClaimMessages;
 using static Business.Features.UserOperationClaims.Constants.UserOperationClaimMessages;
+using DataAccess.Concrete.EfUnitOfWork;
 
 namespace Business.Features.UserOperationClaims.Rules
 {

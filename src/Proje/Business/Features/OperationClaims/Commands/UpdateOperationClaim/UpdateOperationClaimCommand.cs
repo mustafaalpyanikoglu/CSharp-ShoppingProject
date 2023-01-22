@@ -7,7 +7,7 @@ using Entities.Concrete;
 using Core.Application.Pipelines.Authorization;
 using static Business.Features.OperationClaims.Constants.OperationClaims;
 using static Entities.Constants.OperationClaims;
-using DataAccess.Concrete.Contexts;
+using DataAccess.Concrete.EfUnitOfWork;
 
 namespace Business.Features.OperationClaims.Commands.UpdateOperationClaim
 {

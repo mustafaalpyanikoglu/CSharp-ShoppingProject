@@ -2,7 +2,7 @@ using Business.Features.Auths.Constants;
 using Core.Application.Rules;
 using Core.CrossCuttingConcerns.Exceptions;
 using Core.Security.Hashing;
-using DataAccess.Concrete.Contexts;
+using DataAccess.Concrete.EfUnitOfWork;
 using Entities.Concrete;
 
 namespace Application.Features.Auths.Rules;

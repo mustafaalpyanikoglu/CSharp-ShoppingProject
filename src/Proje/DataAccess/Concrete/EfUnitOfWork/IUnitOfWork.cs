@@ -1,8 +1,8 @@
 ﻿using DataAccess.Abstract;
 
-namespace DataAccess.Concrete.Contexts
+namespace DataAccess.Concrete.EfUnitOfWork
 {
-    public interface IUnitOfWork:IDisposable
+    public interface IUnitOfWork : IDisposable
     {
         ICategoryDal CategoryDal { get; }
         IOperationClaimDal OperationClaimDal { get; }
@@ -15,6 +15,6 @@ namespace DataAccess.Concrete.Contexts
         IUserOperationClaimDal UserOperationClaimDal { get; }
         int SaveChanges();
         Task<int> SaveChangesAsync();
-        
+
     }
 }

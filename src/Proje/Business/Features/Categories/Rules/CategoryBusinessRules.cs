@@ -3,7 +3,7 @@ using Core.Application.Rules;
 using Core.CrossCuttingConcerns.Exceptions;
 using Core.Utilities.Abstract;
 using Core.Utilities.Concrete;
-using DataAccess.Concrete.Contexts;
+using DataAccess.Concrete.EfUnitOfWork;
 using Entities.Concrete;
 
 namespace Business.Features.Categorys.Rules
