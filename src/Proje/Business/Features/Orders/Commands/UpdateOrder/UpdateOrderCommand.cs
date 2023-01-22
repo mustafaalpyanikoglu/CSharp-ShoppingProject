@@ -5,6 +5,7 @@ using Business.Features.Products.Rules;
 using Business.Features.UserCarts.Rules;
 using Core.Application.Pipelines.Authorization;
 using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using static Business.Features.Orders.Constants.Orders;
@@ -24,15 +25,15 @@ namespace Business.Features.Orders.Commands.UpdateOrder
         public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, UpdatedOrderDto>
         {
             private readonly IMapper _mapper;
-            private readonly IOrderDal _orderDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly OrderBusinessRules _orderBusinessRules;
             private readonly UserCartBusinessRules _userCartBusinessRules;
 
-            public UpdateOrderCommandHandler(IMapper mapper, IOrderDal orderDal, OrderBusinessRules orderBusinessRules, 
-                UserCartBusinessRules userCartBusinessRules)
+            public UpdateOrderCommandHandler(IMapper mapper, IUnitOfWork unitOfWork, 
+                OrderBusinessRules orderBusinessRules, UserCartBusinessRules userCartBusinessRules)
             {
                 _mapper = mapper;
-                _orderDal = orderDal;
+                _unitOfWork = unitOfWork;
                 _orderBusinessRules = orderBusinessRules;
                 _userCartBusinessRules = userCartBusinessRules;
             }
@@ -47,8 +48,10 @@ namespace Business.Features.Orders.Commands.UpdateOrder
                 mappedOrder.OrderDate = order.OrderDate;
                 mappedOrder.ApprovalDate = order.ApprovalDate;
 
-                Order UpdatedOrder = await _orderDal.UpdateAsync(mappedOrder);
+                Order UpdatedOrder = await _unitOfWork.OrderDal.UpdateAsync(mappedOrder);
                 UpdatedOrderDto UpdateOrderDto = _mapper.Map<UpdatedOrderDto>(UpdatedOrder);
+
+                await _unitOfWork.SaveChangesAsync();
 
                 return UpdateOrderDto;
 

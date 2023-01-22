@@ -4,7 +4,7 @@ using Core.Application.Pipelines.Authorization;
 using Core.Application.Requests;
 using Core.Persistence.Dynamic;
 using Core.Persistence.Paging;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -22,18 +22,18 @@ namespace Business.Features.UserCarts.Queries.GetListUserCartByDynamic
 
         public class GetListUserCartByDynamicQueryHandler : IRequestHandler<GetListUserCartByDynamicQuery, UserCartListModel>
         {
-            private readonly IUserCartDal _UserCartDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
 
-            public GetListUserCartByDynamicQueryHandler(IUserCartDal UserCartDal, IMapper mapper)
+            public GetListUserCartByDynamicQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
             {
-                _UserCartDal = UserCartDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
             }
 
             public async Task<UserCartListModel> Handle(GetListUserCartByDynamicQuery request, CancellationToken cancellationToken)
             {
-                IPaginate<UserCart> UserCarts = await _UserCartDal.GetListByDynamicAsync(
+                IPaginate<UserCart> UserCarts = await _unitOfWork.UserCartDal.GetListByDynamicAsync(
                                       request.Dynamic,
                                       include: x => x.Include(c => c.User),
                                       request.PageRequest.Page,

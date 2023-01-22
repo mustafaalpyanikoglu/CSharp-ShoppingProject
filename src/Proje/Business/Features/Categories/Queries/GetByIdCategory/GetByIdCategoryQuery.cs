@@ -3,6 +3,7 @@ using Business.Features.Categories.Dtos;
 using Business.Features.Categorys.Rules;
 using Core.Application.Pipelines.Authorization;
 using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using static Business.Features.Categories.Constants.OperationClaims;
@@ -19,13 +20,13 @@ namespace Business.Features.Categories.Queries.GetByIdCategory
         public class GetByIdCategoryQueryHandler:IRequestHandler<GetByIdCategoryQuery,CategoryDto>
         {
             private readonly IMapper _mapper;
-            private readonly ICategoryDal _categoryDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly CategoryBusinessRules _categoryBusinessRules;
 
-            public GetByIdCategoryQueryHandler(IMapper mapper, ICategoryDal categoryDal, CategoryBusinessRules categoryBusinessRules)
+            public GetByIdCategoryQueryHandler(IMapper mapper, IUnitOfWork unitOfWork, CategoryBusinessRules categoryBusinessRules)
             {
                 _mapper = mapper;
-                _categoryDal = categoryDal;
+                _unitOfWork = unitOfWork;
                 _categoryBusinessRules = categoryBusinessRules;
             }
 
@@ -33,7 +34,7 @@ namespace Business.Features.Categories.Queries.GetByIdCategory
             {
                 await _categoryBusinessRules.CategoryIdShouldExistWhenSelected(request.Id);
 
-                Category? category = await _categoryDal.GetAsync(m => m.Id == request.Id);
+                Category? category = await _unitOfWork.CategoryDal.GetAsync(m => m.Id == request.Id);
                 CategoryDto CategoryDto = _mapper.Map<CategoryDto>(category);
 
                 return CategoryDto;

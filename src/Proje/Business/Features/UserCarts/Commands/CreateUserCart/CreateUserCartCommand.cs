@@ -2,7 +2,7 @@
 using Business.Features.UserCarts.Dtos;
 using Business.Features.Users.Rules;
 using Core.Application.Pipelines.Authorization;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using static Business.Features.UserCarts.Constants.OperationClaims;
@@ -19,13 +19,13 @@ namespace Business.Features.UserCarts.Commands.CreateUserCart
         public class CreateUserCartCommandHandler : IRequestHandler<CreateUserCartCommand, CreatedUserCartDto>
         {
             private readonly IMapper _mapper;
-            private readonly IUserCartDal _userCartDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly UserBusinessRules _userBusinessRules;
 
-            public CreateUserCartCommandHandler(IMapper mapper, IUserCartDal userCartDal, UserBusinessRules userBusinessRules)
+            public CreateUserCartCommandHandler(IMapper mapper, IUnitOfWork unitOfWork, UserBusinessRules userBusinessRules)
             {
                 _mapper = mapper;
-                _userCartDal = userCartDal;
+                _unitOfWork = unitOfWork;
                 _userBusinessRules = userBusinessRules;
             }
 
@@ -35,8 +35,10 @@ namespace Business.Features.UserCarts.Commands.CreateUserCart
                 await _userBusinessRules.ShouldNotHaveUserCart(request.UserId);
 
                 UserCart mappedUserCart = _mapper.Map<UserCart>(request);
-                UserCart createdUserCart = await _userCartDal.AddAsync(mappedUserCart);
+                UserCart createdUserCart = await _unitOfWork.UserCartDal.AddAsync(mappedUserCart);
                 CreatedUserCartDto createUserCartDto = _mapper.Map<CreatedUserCartDto>(createdUserCart);
+
+                await _unitOfWork.SaveChangesAsync();
 
                 return createUserCartDto;
             }

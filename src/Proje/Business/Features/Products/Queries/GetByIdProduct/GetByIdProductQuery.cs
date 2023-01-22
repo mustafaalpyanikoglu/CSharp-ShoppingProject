@@ -2,7 +2,7 @@
 using Business.Features.Products.Dtos;
 using Business.Features.Products.Rules;
 using Core.Application.Pipelines.Authorization;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -19,13 +19,13 @@ namespace Business.Features.Products.Queries.GetByIdProduct
 
         public class GetByIdProductQueryHandler : IRequestHandler<GetByIdProductQuery, ProductDto>
         {
-            private readonly IProductDal _productDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
             private readonly ProductBusinessRules _productBusinessRules;
 
-            public GetByIdProductQueryHandler(IProductDal productDal, IMapper mapper, ProductBusinessRules productBusinessRules)
+            public GetByIdProductQueryHandler(IUnitOfWork unitOfWork, IMapper mapper, ProductBusinessRules productBusinessRules)
             {
-                _productDal = productDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
                 _productBusinessRules = productBusinessRules;
             }
@@ -34,7 +34,7 @@ namespace Business.Features.Products.Queries.GetByIdProduct
             {
                 await _productBusinessRules.ProductIdShouldExistWhenSelected(request.Id);
 
-                Product? Product = await _productDal.GetAsync(m => m.Id == request.Id,
+                Product? Product = await _unitOfWork.ProductDal.GetAsync(m => m.Id == request.Id,
                                                               include: x=>x.Include(c=> c.Category));
                 ProductDto ProductDto = _mapper.Map<ProductDto>(Product);
 

@@ -2,7 +2,7 @@
 using Business.Features.Users.Dtos;
 using Business.Features.Users.Rules;
 using Core.Application.Pipelines.Authorization;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using static Business.Features.Users.Constants.OperationClaims;
@@ -17,13 +17,13 @@ namespace Business.Features.Users.Queries.GetByIdUser
 
         public class GetByIdUserQueryHanlder : IRequestHandler<GetByIdUserQuery, UserDto>
         {
-            private readonly IUserDal _userDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
             private readonly UserBusinessRules _userBusinessRules;
 
-            public GetByIdUserQueryHanlder(IUserDal userDal, IMapper mapper, UserBusinessRules userBusinessRules)
+            public GetByIdUserQueryHanlder(IUnitOfWork unitOfWork, IMapper mapper, UserBusinessRules userBusinessRules)
             {
-                _userDal = userDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
                 _userBusinessRules = userBusinessRules;
             }
@@ -32,7 +32,7 @@ namespace Business.Features.Users.Queries.GetByIdUser
             {
                 await _userBusinessRules.UserIdMustBeAvailable(request.Id);
 
-                User? user = await _userDal.GetAsync(u => u.Id == request.Id);
+                User? user = await _unitOfWork.UserDal.GetAsync(u => u.Id == request.Id);
                 UserDto userDto = _mapper.Map<UserDto>(user);
 
                 return userDto;

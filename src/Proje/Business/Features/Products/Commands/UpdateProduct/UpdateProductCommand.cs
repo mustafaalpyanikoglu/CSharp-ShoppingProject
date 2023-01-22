@@ -2,7 +2,8 @@
 using Business.Features.Categorys.Rules;
 using Business.Features.Products.Dtos;
 using Business.Features.Products.Rules;
-using DataAccess.Abstract;
+using Core.Application.Pipelines.Authorization;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using static Business.Features.Products.Constants.OperationClaims;
@@ -10,7 +11,7 @@ using static Entities.Constants.OperationClaims;
 
 namespace Business.Features.Products.Commands.UpdateProduct
 {
-    public class UpdateProductCommand : IRequest<UpdatedProductDto>//, ISecuredRequest
+    public class UpdateProductCommand : IRequest<UpdatedProductDto>, ISecuredRequest
     {
         public int Id { get; set; }
         public int CategoryId { get; set; }
@@ -23,14 +24,14 @@ namespace Business.Features.Products.Commands.UpdateProduct
         public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, UpdatedProductDto>
         {
             private readonly IMapper _mapper;
-            private readonly IProductDal _productDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly ProductBusinessRules _productBusinessRules;
             private readonly CategoryBusinessRules _categoryBusinessRules;
 
-            public UpdateProductCommandHandler(IMapper mapper, IProductDal productDal, ProductBusinessRules productBusinessRules, CategoryBusinessRules categoryBusinessRules)
+            public UpdateProductCommandHandler(IMapper mapper, IUnitOfWork unitOfWork, ProductBusinessRules productBusinessRules, CategoryBusinessRules categoryBusinessRules)
             {
                 _mapper = mapper;
-                _productDal = productDal;
+                _unitOfWork = unitOfWork;
                 _productBusinessRules = productBusinessRules;
                 _categoryBusinessRules = categoryBusinessRules;
             }
@@ -41,8 +42,10 @@ namespace Business.Features.Products.Commands.UpdateProduct
                 await _categoryBusinessRules.CategoryIdShouldExistWhenSelected(request.CategoryId);
 
                 Product mappedProduct = _mapper.Map<Product>(request);
-                Product updatedProduct = await _productDal.UpdateAsync(mappedProduct);
+                Product updatedProduct = await _unitOfWork.ProductDal.UpdateAsync(mappedProduct);
                 UpdatedProductDto updateProductDto = _mapper.Map<UpdatedProductDto>(updatedProduct);
+
+                await _unitOfWork.SaveChangesAsync();
 
                 return updateProductDto;
             }

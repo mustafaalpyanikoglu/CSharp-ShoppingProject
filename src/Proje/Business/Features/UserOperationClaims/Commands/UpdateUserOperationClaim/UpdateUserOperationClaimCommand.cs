@@ -2,7 +2,7 @@
 using Business.Features.UserOperationClaims.Dtos;
 using Business.Features.UserOperationClaims.Rules;
 using Core.Application.Pipelines.Authorization;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using static Business.Features.UserOperationClaims.Constants.OperationClaims;
@@ -20,13 +20,14 @@ namespace Business.Features.UserOperationClaims.Commands.UpdateUserOperationClai
 
         public class UpdateUserOperationClaimCommandHandler : IRequestHandler<UpdateUserOperationClaimCommand, UpdateUserOperationClaimDto>
         {
-            private readonly IUserOperationClaimDal _userOperationClaimDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
             private readonly UserOperationClaimBusinessRules _userOperationClaimBusinessRules;
 
-            public UpdateUserOperationClaimCommandHandler(IUserOperationClaimDal userOperationClaimDal, IMapper mapper, UserOperationClaimBusinessRules userOperationClaimBusinessRules)
+            public UpdateUserOperationClaimCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, 
+                UserOperationClaimBusinessRules userOperationClaimBusinessRules)
             {
-                _userOperationClaimDal = userOperationClaimDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
                 _userOperationClaimBusinessRules = userOperationClaimBusinessRules;
             }
@@ -38,7 +39,7 @@ namespace Business.Features.UserOperationClaims.Commands.UpdateUserOperationClai
                 await _userOperationClaimBusinessRules.OperationClaimIdMustBeAvailable(request.OperationClaimId);
 
                 UserOperationClaim mappedUserOperationClaim = _mapper.Map<UserOperationClaim>(request);
-                UserOperationClaim updatedUserOperationClaim = await _userOperationClaimDal.UpdateAsync(mappedUserOperationClaim);
+                UserOperationClaim updatedUserOperationClaim = await _unitOfWork.UserOperationClaimDal.UpdateAsync(mappedUserOperationClaim);
                 UpdateUserOperationClaimDto updateUserOperationClaimDto = _mapper.Map<UpdateUserOperationClaimDto>(updatedUserOperationClaim);
 
                 return updateUserOperationClaimDto;

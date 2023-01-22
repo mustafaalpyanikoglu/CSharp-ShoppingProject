@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
-using Business.Features.Products.Dtos;
 using Business.Features.Products.Models;
 using Core.Application.Requests;
 using Core.Persistence.Paging;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -17,18 +16,18 @@ namespace Business.Features.Products.Queries.GetListProductByName
 
         public class GetListByCategoryNameQueryHandlder : IRequestHandler<GetListByCategoryNameQuery, ProductListByNameModel>
         {
-            private readonly IProductDal _productDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
 
-            public GetListByCategoryNameQueryHandlder(IProductDal productDal, IMapper mapper)
+            public GetListByCategoryNameQueryHandlder(IUnitOfWork unitOfWork, IMapper mapper)
             {
-                _productDal = productDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
             }
 
             public async Task<ProductListByNameModel> Handle(GetListByCategoryNameQuery request, CancellationToken cancellationToken)
             {
-                IPaginate<Product> Products = await _productDal.GetListAsync(
+                IPaginate<Product> Products = await _unitOfWork.ProductDal.GetListAsync(
                     p=> p.Category.Name == request.CategoryName,
                     index: request.PageRequest.Page,
                     size: request.PageRequest.PageSize,

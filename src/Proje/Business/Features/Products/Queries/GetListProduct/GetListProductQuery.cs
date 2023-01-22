@@ -2,7 +2,7 @@
 using Business.Features.Products.Models;
 using Core.Application.Requests;
 using Core.Persistence.Paging;
-using DataAccess.Abstract;
+using DataAccess.Concrete.Contexts;
 using Entities.Concrete;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -15,18 +15,18 @@ namespace Business.Features.Products.Queries.GetListProduct
 
         public class GetListProductQueryHanlder : IRequestHandler<GetListProductQuery, ProductListModel>
         {
-            private readonly IProductDal _productDal;
+            private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
 
-            public GetListProductQueryHanlder(IProductDal productDal, IMapper mapper)
+            public GetListProductQueryHanlder(IUnitOfWork unitOfWork, IMapper mapper)
             {
-                _productDal = productDal;
+                _unitOfWork = unitOfWork;
                 _mapper = mapper;
             }
 
             public async Task<ProductListModel> Handle(GetListProductQuery request, CancellationToken cancellationToken)
             {
-                IPaginate<Product> Products = await _productDal.GetListAsync(index: request.PageRequest.Page,
+                IPaginate<Product> Products = await _unitOfWork.ProductDal.GetListAsync(index: request.PageRequest.Page,
                                                                              size: request.PageRequest.PageSize,
                                                                              include: x => x.Include(c => c.Category));
                 ProductListModel mappedProductListModel = _mapper.Map<ProductListModel>(Products);
