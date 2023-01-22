@@ -36,6 +36,7 @@ namespace Business.Features.Purses.Commands.CreatePurse
             public async Task<CreatedPurseDto> Handle(CreatePurseCommand request, CancellationToken cancellationToken)
             {
                 await _userBusinessRules.UserIdMustBeAvailable(request.UserId);
+                await _userBusinessRules.ShouldNotHavePuser(request.UserId);
 
                 Purse mappedPurse = _mapper.Map<Purse>(request);
                 Purse createdPurse = await _purseDal.AddAsync(mappedPurse);

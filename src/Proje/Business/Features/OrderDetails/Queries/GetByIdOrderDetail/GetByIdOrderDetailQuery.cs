@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using static Business.Features.OrderDetails.Constants.OperationClaims;
 using static Entities.Constants.OperationClaims;
 
-namespace Business.Features.OrderDetailDetails.Queries.GetByIdOrderDetailDetail
+namespace Business.Features.OrderDetails.Queries.GetByIdOrderDetail
 {
     public class GetByIdOrderDetailQuery : IRequest<OrderDetailDto>, ISecuredRequest
     {
