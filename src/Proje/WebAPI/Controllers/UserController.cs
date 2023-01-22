@@ -43,20 +43,21 @@ namespace WebAPI.Controllers
             UserListModel result = await Mediator.Send(getListUserQuery);
             return Ok(result);
         }
-        [HttpPut("FromAuth")]
+        [HttpPut("fromauth")]
         public async Task<IActionResult> UpdateFromAuth([FromBody] UpdateUserFromAuthCommand updateUserFromAuthCommand)
         {
             //updateUserFromAuthCommand.Id = getUserIdFromRequest();
             UpdatedUserFromAuthDto result = await Mediator.Send(updateUserFromAuthCommand);
             return Ok(result);
         }
-        [HttpGet("{Id}")]
-        public async Task<IActionResult> GetById([FromRoute] GetByIdUserQuery getByIdUserQuery)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById([FromRoute] int id)
         {
+            GetByIdUserQuery getByIdUserQuery = new() { Id = id };
             UserDto result = await Mediator.Send(getByIdUserQuery);
             return Ok(result);
         }
-        [HttpPost("GetList/ByDynamic")]
+        [HttpPost("getlist/bydynamic")]
         public async Task<IActionResult> GetListByDynamic([FromQuery] PageRequest pageRequest,
                                                       [FromBody] Dynamic? dynamic = null)
         {

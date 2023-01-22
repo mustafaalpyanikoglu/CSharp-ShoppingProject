@@ -27,6 +27,11 @@ namespace Business.Features.Orders.Rules
             Order? result = await _unitOfWork.OrderDal.GetAsync(b => b.OrderNumber == orderNumber);
             if (result == null) throw new BusinessException(OrderNotFound);
         }
+        public async Task OrderStatusMustBeFalse(int? orderId)
+        {
+            Order? result = await _unitOfWork.OrderDal.GetAsync(b => b.Id == orderId);
+            if (result?.Status == true) throw new BusinessException(OrderHasAlreadyBeenConfirmed);
+        }
 
         public Task OrderStatusMustBeFalse(bool status)
         {

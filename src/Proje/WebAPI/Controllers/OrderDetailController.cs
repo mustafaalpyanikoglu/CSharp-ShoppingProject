@@ -52,34 +52,35 @@ namespace WebAPI.Controllers
             OrderDetailListModel result = await Mediator.Send(getListOrderDetailQuery);
             return Ok(result);
         }
-        [HttpGet("GetList/MyUserCart/UserId/{userId}")]
+        [HttpGet("getlistmyusercartuserid/{userId}")]
         public async Task<IActionResult> GetListOrderByUserCart([FromRoute] int userId, [FromQuery] PageRequest pageRequest)
         {
             GetListOrderDetailByUserCartQuery getListOrderByUserCartQuery = new() { UserId = userId, PageRequest = pageRequest };
             OrderDetailListByUserCartModel result = await Mediator.Send(getListOrderByUserCartQuery);
             return Ok(result);
         }
-        [HttpGet("GetList/PastOrder/{userId}")]
+        [HttpGet("getlistpastorder/{userId}")]
         public async Task<IActionResult> GetListPastOrder([FromRoute] int userId, [FromQuery] PageRequest pageRequest)
         {
             GetListPastOrderDetailQuery getListPastOrderQuery = new() { UserId = userId, PageRequest = pageRequest };
             UserPastOrderListModel result = await Mediator.Send(getListPastOrderQuery);
             return Ok(result);
         }
-        [HttpGet("GetBy/OrderNumberOrderDetail/{orderNumber}")]
+        [HttpGet("getbyorderbumberorderdetail/{orderNumber}")]
         public async Task<IActionResult> GetListOrderDetailByOrderName([FromRoute] string orderNumber, [FromQuery] PageRequest pageRequest)
         {
             GetListOrderDetailByOrderNameQuery getListOrderDetailByOrderNameQuery = new() { OrderNumber = orderNumber, PageRequest = pageRequest };
             OrderDetailListByUserCartModel result = await Mediator.Send(getListOrderDetailByOrderNameQuery);
             return Ok(result);
         }
-        [HttpGet("{Id}")]
-        public async Task<IActionResult> GetById([FromRoute] GetByIdOrderDetailQuery getByIdOrderDetailQuery)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById([FromRoute] int id)
         {
+            GetByIdOrderDetailQuery getByIdOrderDetailQuery = new() { Id = id };
             OrderDetailDto result = await Mediator.Send(getByIdOrderDetailQuery);
             return Ok(result);
         }
-        [HttpPost("GetList/ByDynamic")]
+        [HttpPost("getlist/bydynamic")]
         public async Task<IActionResult> GetListByDynamic([FromQuery] PageRequest pageRequest,
                                                       [FromBody] Dynamic? dynamic = null)
         {

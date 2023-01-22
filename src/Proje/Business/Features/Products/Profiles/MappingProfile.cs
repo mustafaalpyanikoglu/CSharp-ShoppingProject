@@ -21,7 +21,7 @@ namespace Business.Features.Products.Profiles
             CreateMap<Product, UpdatedProductDto>().ReverseMap();
             CreateMap<Product, ProductDto>().ForMember(x=> x.CategoryName, opt=> opt.MapFrom(x=> x.Category.Name))
                                             .ReverseMap();
-            CreateMap<Product, ProductDto>().ForMember(x => x.CategoryName, opt => opt.MapFrom(x => x.Category.Name))
+            CreateMap<Product, ProductListDto>().ForMember(x => x.CategoryName, opt => opt.MapFrom(x => x.Category.Name))
                                             .ReverseMap();
             CreateMap<Product, ProductListByNameDto>().ForMember(x => x.CategoryName, opt => opt.MapFrom(x => x.Category.Name))
                                                 .ReverseMap();

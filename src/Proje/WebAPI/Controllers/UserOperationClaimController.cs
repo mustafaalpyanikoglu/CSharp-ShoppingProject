@@ -42,13 +42,14 @@ namespace WebAPI.Controllers
             UserOperationClaimListModel result = await Mediator.Send(getListUserOperationClaimQuery);
             return Ok(result);
         }
-        [HttpGet("{Id}")]
-        public async Task<IActionResult> GetById([FromRoute] GetByIdUserOperationClaimQuery getByIdUserOperationClaimQuery)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById([FromRoute] int id)
         {
+            GetByIdUserOperationClaimQuery getByIdUserOperationClaimQuery = new() { Id= id };
             UserOperationClaimDto result = await Mediator.Send(getByIdUserOperationClaimQuery);
             return Ok(result);
         }
-        [HttpPost("GetList/ByDynamic")]
+        [HttpPost("getlist/bydynamic")]
         public async Task<IActionResult> GetListByDynamic([FromQuery] PageRequest pageRequest,
                                                       [FromBody] Dynamic? dynamic = null)
         {
