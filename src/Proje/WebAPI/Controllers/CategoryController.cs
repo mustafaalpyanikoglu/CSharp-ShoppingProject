@@ -43,19 +43,21 @@ namespace WebAPI.Controllers
             CategoryListModel result = await Mediator.Send(getListCategoryQuery);
             return Ok(result);
         }
-        [HttpGet("GetBy/CategoryId/{Id}")]
-        public async Task<IActionResult> GetById([FromRoute] GetByIdCategoryQuery getByIdCategoryQuery)
+        [HttpGet("getbycategoryid/{id}")]
+        public async Task<IActionResult> GetById([FromRoute] int id)
         {
+            GetByIdCategoryQuery getByIdCategoryQuery = new() { Id= id };
             CategoryDto result = await Mediator.Send(getByIdCategoryQuery);
             return Ok(result);
         }
-        [HttpGet("GetBy/CategoryName/{CategoryName}")]
-        public async Task<IActionResult> GetByCategoryName([FromRoute] GetByNameCategoryQuery getByNameCategoryQuery)
+        [HttpGet("getbycategoryname/{categoryName}")]
+        public async Task<IActionResult> GetByCategoryName([FromRoute] string categoryName)
         {
+            GetByNameCategoryQuery getByNameCategoryQuery = new() { CategoryName = categoryName };
             CategoryDto result = await Mediator.Send(getByNameCategoryQuery);
             return Ok(result);
         }
-        [HttpPost("GetList/ByDynamic")]
+        [HttpPost("getlist/bydynamic")]
         public async Task<IActionResult> GetListByDynamic([FromQuery] PageRequest pageRequest,
                                                       [FromBody] Dynamic? dynamic = null)
         {

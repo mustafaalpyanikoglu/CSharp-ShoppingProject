@@ -61,7 +61,9 @@ namespace Business.Features.Orders.Commands.CreateOrder
                         OrderDate = Convert.ToDateTime(DateTime.Now.ToString("F")),
                         Status = false,
                     });
-
+                    //burda kaydetmek zorundayız çünkü OrderDetail tablosuna veri
+                    //ekleyebilmek için FK alacağı tabloda veri olması lazım
+                    await _unitOfWork.SaveChangesAsync();
                     OrderDetail orderDetail = await _unitOfWork.OrderDetailDal.AddAsync(new OrderDetail
                     {
                         OrderId = createdOrder.Id,

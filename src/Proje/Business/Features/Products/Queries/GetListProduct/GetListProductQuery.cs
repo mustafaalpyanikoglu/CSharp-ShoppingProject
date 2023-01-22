@@ -26,10 +26,11 @@ namespace Business.Features.Products.Queries.GetListProduct
 
             public async Task<ProductListModel> Handle(GetListProductQuery request, CancellationToken cancellationToken)
             {
-                IPaginate<Product> Products = await _unitOfWork.ProductDal.GetListAsync(index: request.PageRequest.Page,
-                                                                             size: request.PageRequest.PageSize,
-                                                                             include: x => x.Include(c => c.Category));
-                ProductListModel mappedProductListModel = _mapper.Map<ProductListModel>(Products);
+                IPaginate<Product> products = await _unitOfWork.ProductDal.GetListAsync(
+                                                                             include: x => x.Include(c => c.Category),
+                                                                             index: request.PageRequest.Page,
+                                                                             size: request.PageRequest.PageSize);
+                ProductListModel mappedProductListModel = _mapper.Map<ProductListModel>(products);
                 return mappedProductListModel;
 
             }
