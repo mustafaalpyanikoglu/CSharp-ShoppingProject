@@ -1,6 +1,6 @@
 ﻿using Business.Features.Purses.Rules;
 using DataAccess.Abstract;
-using DataAccess.Concrete.Contexts;
+using DataAccess.Concrete.EfUnitOfWork;
 using Entities.Concrete;
 
 namespace Business.Services.PurseService
