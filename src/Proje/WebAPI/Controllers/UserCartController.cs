@@ -42,13 +42,14 @@ namespace WebAPI.Controllers
             UserCartListModel result = await Mediator.Send(getListUserCartQuery);
             return Ok(result);
         }
-        [HttpGet("{Id}")]
-        public async Task<IActionResult> GetById([FromRoute] GetByIdUserCartQuery getByIdUserCartQuery)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById([FromRoute] int id)
         {
+            GetByIdUserCartQuery getByIdUserCartQuery = new() { Id = id };
             UserCartDto result = await Mediator.Send(getByIdUserCartQuery);
             return Ok(result);
         }
-        [HttpPost("GetList/ByDynamic")]
+        [HttpPost("getlist/bydynamic")]
         public async Task<IActionResult> GetListByDynamic([FromQuery] PageRequest pageRequest,
                                                       [FromBody] Dynamic? dynamic = null)
         {

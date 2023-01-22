@@ -41,19 +41,21 @@ namespace WebAPI.Controllers
             PurseListModel result = await Mediator.Send(getListPurseQuery);
             return Ok(result);
         }
-        [HttpGet("/GetBy/Id/{Id}")]
-        public async Task<IActionResult> GetById([FromRoute] GetByIdPurseQuery getByIdPurseQuery)
+        [HttpGet("getbyid/{id}")]
+        public async Task<IActionResult> GetById([FromRoute] int id)
         {
+            GetByIdPurseQuery getByIdPurseQuery = new GetByIdPurseQuery { Id = id };
             PurseDto result = await Mediator.Send(getByIdPurseQuery);
             return Ok(result);
         }
-        [HttpGet("GetBy/Email/{Email}")]
-        public async Task<IActionResult> GetByEmail([FromRoute] GetByEmailPurseQuery getByIdPurseQuery)
+        [HttpGet("getbyemail/{email}")]
+        public async Task<IActionResult> GetByEmail([FromRoute] string email)
         {
+            GetByEmailPurseQuery getByIdPurseQuery = new GetByEmailPurseQuery { Email = email };
             PurseDto result = await Mediator.Send(getByIdPurseQuery);
             return Ok(result);
         }
-        [HttpPost("GetList/ByDynamic")]
+        [HttpPost("getlist/bydynamic")]
         public async Task<IActionResult> GetListByDynamic([FromQuery] PageRequest pageRequest,
                                                       [FromBody] Dynamic? dynamic = null)
         {

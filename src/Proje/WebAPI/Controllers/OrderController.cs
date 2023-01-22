@@ -49,13 +49,14 @@ namespace WebAPI.Controllers
             OrderListModel result = await Mediator.Send(getListOrderQuery);
             return Ok(result);
         }
-        [HttpGet("{Id}")]
-        public async Task<IActionResult> GetById([FromRoute] GetByIdOrderQuery getByIdOrderQuery)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById([FromRoute] int id)
         {
+            GetByIdOrderQuery getByIdOrderQuery = new() { Id= id };
             OrderDto result = await Mediator.Send(getByIdOrderQuery);
             return Ok(result);
         }
-        [HttpPost("GetList/ByDynamic")]
+        [HttpPost("getlist/bydynamic")]
         public async Task<IActionResult> GetListByDynamic([FromQuery] PageRequest pageRequest,
                                                       [FromBody] Dynamic? dynamic = null)
         {

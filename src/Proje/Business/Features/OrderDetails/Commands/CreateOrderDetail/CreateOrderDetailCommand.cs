@@ -44,6 +44,7 @@ namespace Business.Features.OrderDetails.Commands.CreateOrder
                 await _orderBusinessRules.OrderIdShouldExistWhenSelected(request.OrderId);
                 Product product = await _productBusinessRules.ExistingDataShouldBeFetchedWhenTransactionRequestIdIsSelected(request.ProductId);
                 await _orderDetailBusinessRules.TheNumberOfProductsOrderDetailedShouldNotBeMoreThanStock(request.ProductId,request.Quantity);
+                await _orderBusinessRules.OrderStatusMustBeFalse(request.OrderId);
 
                 OrderDetail mappedOrderDetail = _mapper.Map<OrderDetail>(request);
 

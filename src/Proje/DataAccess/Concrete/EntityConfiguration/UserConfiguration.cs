@@ -15,7 +15,7 @@ namespace DataAccess.Concrete.EntityConfiguration
             builder.Property(u => u.LastName).HasColumnName("LastName").HasMaxLength(50).IsRequired();
             builder.Property(u => u.PhoneNumber).HasColumnName("PhoneNumber").HasMaxLength(50).IsRequired();
             builder.Property(u => u.Address).HasColumnName("Address").HasMaxLength(50).IsRequired();
-            builder.Property(u => u.Email).HasColumnName("Email").HasMaxLength(50);
+            builder.Property(u => u.Email).HasColumnName("Email").HasMaxLength(200);
             builder.Property(u => u.PasswordHash).HasColumnName("PasswordHash").HasColumnType("varbinary(500)").IsRequired();
             builder.Property(u => u.PasswordSalt).HasColumnName("PasswordSalt").HasColumnType("varbinary(500)").IsRequired();
             builder.Property(u => u.RegistrationDate).HasColumnName("RegistrationDate").IsRequired();
