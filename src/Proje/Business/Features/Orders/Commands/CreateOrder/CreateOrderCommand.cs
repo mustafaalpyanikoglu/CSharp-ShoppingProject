@@ -3,6 +3,7 @@ using Business.Features.OrderDetails.Rules;
 using Business.Features.Orders.Dtos;
 using Business.Features.Products.Rules;
 using Business.Features.UserCarts.Rules;
+using Business.Services.OrderDetailService;
 using Business.Services.OrderService;
 using Core.Application.Pipelines.Authorization;
 using DataAccess.Concrete.EfUnitOfWork;
@@ -29,10 +30,12 @@ namespace Business.Features.Orders.Commands.CreateOrder
             private readonly ProductBusinessRules _productBusinessRules;
             private readonly OrderDetailBusinessRules _orderDetailBusinessRules;
             private readonly IUnitOfWork _unitOfWork;
+            private readonly IOrderDetailService _orderDetailService;
 
             public CreateOrderCommandHandler(IMapper mapper, IOrderService orderService, 
                 UserCartBusinessRules userCartBusinessRules, ProductBusinessRules productBusinessRules, 
-                OrderDetailBusinessRules orderDetailBusinessRules, IUnitOfWork unitOfWork)
+                OrderDetailBusinessRules orderDetailBusinessRules, IUnitOfWork unitOfWork, 
+                IOrderDetailService orderDetailService)
             {
                 _mapper = mapper;
                 _orderService = orderService;
@@ -40,6 +43,7 @@ namespace Business.Features.Orders.Commands.CreateOrder
                 _productBusinessRules = productBusinessRules;
                 _orderDetailBusinessRules = orderDetailBusinessRules;
                 _unitOfWork = unitOfWork;
+                _orderDetailService = orderDetailService;
             }
 
             public async Task<CreatedOrderDto> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
@@ -59,6 +63,7 @@ namespace Business.Features.Orders.Commands.CreateOrder
                         UserCartId = request.UserCartId,
                         OrderNumber = await _orderService.CreateOrderNumber(),
                         OrderDate = Convert.ToDateTime(DateTime.Now.ToString("F")),
+                        OrderAmount = product.Price * request.Quantity,
                         Status = false,
                     });
                     //burda kaydetmek zorundayız çünkü OrderDetail tablosuna veri
@@ -88,7 +93,7 @@ namespace Business.Features.Orders.Commands.CreateOrder
                     }
                     else
                     {
-                        await _unitOfWork.OrderDetailDal.AddAsync(new OrderDetail
+                        updatedOrderDetail = await _unitOfWork.OrderDetailDal.AddAsync(new OrderDetail
                         {
                             OrderId = currentOrder.Id,
                             ProductId = request.ProductId,
@@ -96,8 +101,17 @@ namespace Business.Features.Orders.Commands.CreateOrder
                             TotalPrice = product.Price * request.Quantity
                         });
                     }
+                    Order updatedOrder = await _unitOfWork.OrderDal.UpdateAsync(new Order
+                    {
+                        Id = currentOrder.Id,
+                        UserCartId = request.UserCartId,
+                        OrderNumber = await _orderService.CreateOrderNumber(),
+                        OrderDate = Convert.ToDateTime(DateTime.Now.ToString("F")),
+                        OrderAmount = await _orderDetailService.AmountUserCart(currentOrder.Id) + updatedOrderDetail.TotalPrice,
+                        Status = false,
+                    });
                     await _unitOfWork.SaveChangesAsync();
-                    CreatedOrderDto createOrderDto = _mapper.Map<CreatedOrderDto>(currentOrder);
+                    CreatedOrderDto createOrderDto = _mapper.Map<CreatedOrderDto>(updatedOrder);
                     return createOrderDto;
                 }
             }
