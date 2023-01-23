@@ -47,16 +47,25 @@ namespace Business.Features.OrderDetails.Commands.UpdateOrder
                 await _orderDetailBusinessRules.TheNumberOfProductsOrderDetailedShouldNotBeMoreThanStock(request.ProductId, request.Quantity);
                 await _orderBusinessRules.OrderStatusMustBeFalse(request.OrderId);
 
+                OrderDetail? orderDetail = await _unitOfWork.OrderDetailDal.GetAsync(o => o.Id== request.Id);
+
+                Order? updatedOrder = await _unitOfWork.OrderDal.GetAsync(o => o.Id == request.OrderId);
+                updatedOrder.OrderAmount -= orderDetail.TotalPrice;
+
+
                 OrderDetail mappedOrderDetail = _mapper.Map<OrderDetail>(request);
 
                 mappedOrderDetail.TotalPrice = product.Price * request.Quantity;
 
-                OrderDetail UpdatedOrderDetail = await _unitOfWork.OrderDetailDal.UpdateAsync(mappedOrderDetail);
-                UpdatedOrderDetailDto createOrderDetailDto = _mapper.Map<UpdatedOrderDetailDto>(UpdatedOrderDetail);
-
+                OrderDetail updatedOrderDetail = await _unitOfWork.OrderDetailDal.UpdateAsync(mappedOrderDetail);
+                UpdatedOrderDetailDto updatedOrderDetailDto = _mapper.Map<UpdatedOrderDetailDto>(updatedOrderDetail);
+                
+                updatedOrder.OrderAmount += product.Price * request.Quantity;
+                await _unitOfWork.OrderDal.UpdateAsync(updatedOrder);
+               
                 await _unitOfWork.SaveChangesAsync();
 
-                return createOrderDetailDto;
+                return updatedOrderDetailDto;
             }
         }
     }

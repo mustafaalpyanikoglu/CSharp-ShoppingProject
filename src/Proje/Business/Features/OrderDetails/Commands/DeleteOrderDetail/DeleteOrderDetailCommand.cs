@@ -32,7 +32,12 @@ namespace Business.Features.OrderDetails.Commands.DeleteOrder
 
             public async Task<DeletedOrderDetailDto> Handle(DeleteOrderDetailCommand request, CancellationToken cancellationToken)
             {
-                await _orderDetailBusinessRules.OrderDetailIdShouldExistWhenSelected(request.Id);
+                OrderDetail orderDetail = await _orderDetailBusinessRules.ExistingDataShouldBeFetchedWhenTransactionRequestIdIsSelected(request.Id);
+
+                Order? updatedOrder = await _unitOfWork.OrderDal.GetAsync(o => o.Id == orderDetail.OrderId);
+                updatedOrder.OrderAmount -= orderDetail.TotalPrice;
+                await _unitOfWork.OrderDal.UpdateAsync(updatedOrder);
+
 
                 OrderDetail mappedOrderDetail = _mapper.Map<OrderDetail>(request);
                 OrderDetail DeletedOrderDetail = await _unitOfWork.OrderDetailDal.DeleteAsync(mappedOrderDetail);
