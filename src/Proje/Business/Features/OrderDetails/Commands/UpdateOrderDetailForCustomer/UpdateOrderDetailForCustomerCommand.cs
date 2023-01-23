@@ -44,7 +44,6 @@ namespace Business.Features.OrderDetails.Commands.UpdateOrderDetailForCustomer
                 Order? updatedOrder = await _unitOfWork.OrderDal.GetAsync(o => o.Id == orderDetail.OrderId);
                 updatedOrder.OrderAmount -= orderDetail.TotalPrice;
 
-                await _unitOfWork.OrderDal.UpdateAsync(updatedOrder);
 
                 if (request.Quantity == 0) //Sepetteki ürün sıfırlanıyorsa ürün sepetten silinmeli
                 {
@@ -61,11 +60,11 @@ namespace Business.Features.OrderDetails.Commands.UpdateOrderDetailForCustomer
                 }
 
                 orderDetail.ProductId = orderDetail.ProductId;
-                orderDetail.Quantity = request.Quantity + orderDetail.Quantity;
-                orderDetail.TotalPrice = product.Price * orderDetail.Quantity;
+                orderDetail.Quantity = request.Quantity;
+                orderDetail.TotalPrice = product.Price * request.Quantity;
                 orderDetail.Id = request.Id;
 
-                updatedOrder.OrderAmount += (product.Price * request.Quantity);
+                updatedOrder.OrderAmount = (product.Price * request.Quantity);
                 await _unitOfWork.OrderDal.UpdateAsync(updatedOrder);
 
                 OrderDetail updatedOrderDetail = await _unitOfWork.OrderDetailDal.UpdateAsync(orderDetail);

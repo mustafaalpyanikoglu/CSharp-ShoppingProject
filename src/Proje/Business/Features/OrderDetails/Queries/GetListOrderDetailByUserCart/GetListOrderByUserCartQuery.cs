@@ -1,13 +1,11 @@
 ﻿using AutoMapper;
 using Business.Features.OrderDetails.Models;
 using Business.Features.OrderDetails.Rules;
-using Business.Features.UserCarts.Rules;
 using Business.Features.Users.Rules;
 using Business.Services.OrderDetailService;
 using Core.Application.Pipelines.Authorization;
 using Core.Application.Requests;
 using Core.Persistence.Paging;
-using DataAccess.Abstract;
 using DataAccess.Concrete.EfUnitOfWork;
 using Entities.Concrete;
 using MediatR;
@@ -50,10 +48,8 @@ namespace Business.Features.OrderDetailDetails.Queries.GetListOrderDetailDetailB
                 OrderDetail? orderDetail = await _unitOfWork.OrderDetailDal.GetAsync(o => o.Order.UserCart.UserId == request.UserId && o.Order.Status == false, include: c => c.Include(c => c.Order));
 
                 await _orderDetailBusinessRules.IsOrderDetailNull(orderDetail);
-
                 await _orderDetailBusinessRules.OrderDetailIdShouldExistWhenSelected(orderDetail.Id);
 
-                float totalPrice = await _orderDetailService.AmountUserCart(orderDetail.OrderId);
 
                 IPaginate<OrderDetail> OrderDetails = await _unitOfWork.OrderDetailDal.GetListAsync(
                     o => o.Order.UserCart.UserId == request.UserId && o.Order.Status == false,
@@ -65,7 +61,7 @@ namespace Business.Features.OrderDetailDetails.Queries.GetListOrderDetailDetailB
                     index: request.PageRequest.Page,
                     size: request.PageRequest.PageSize);
                 OrderDetailListByUserCartModel mappedGetListOrderDetailByUserCartDto = _mapper.Map<OrderDetailListByUserCartModel>(OrderDetails);
-                mappedGetListOrderDetailByUserCartDto.AmountOfPayment = totalPrice;
+
                 return mappedGetListOrderDetailByUserCartDto;
             }
         }
