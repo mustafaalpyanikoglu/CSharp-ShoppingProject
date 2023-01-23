@@ -15,6 +15,7 @@ namespace DataAccess.Concrete.EntityConfiguration
             builder.Property(u => u.OrderNumber).HasColumnName("OrderNumber").HasMaxLength(50).IsRequired();
             builder.Property(u => u.OrderDate).HasColumnName("OrderDate").IsRequired();
             builder.Property(u => u.ApprovalDate).HasColumnName("ApprovalDate").IsRequired();
+            builder.Property(u => u.OrderAmount).HasColumnName("OrderAmount").IsRequired();
             builder.Property(u => u.Status).HasColumnName("Status").IsRequired();
 
 

@@ -40,11 +40,18 @@ namespace Business.Features.OrderDetails.Commands.UpdateOrderDetailForCustomer
                 await _orderDetailBusinessRules.TheNumberOfProductsOrderDetailedShouldNotBeMoreThanStock(orderDetail.ProductId, request.Quantity + orderDetail.Quantity);
                 await _orderBusinessRules.OrderStatusMustBeFalse(orderDetail.OrderId);
 
-                Product product = await _unitOfWork.ProductDal.GetAsync(p => p.Id == orderDetail.ProductId);
+                Product? product = await _unitOfWork.ProductDal.GetAsync(p => p.Id == orderDetail.ProductId);
+                Order? updatedOrder = await _unitOfWork.OrderDal.GetAsync(o => o.Id == orderDetail.OrderId);
+                updatedOrder.OrderAmount -= orderDetail.TotalPrice;
 
-                if(request.Quantity == 0) //Sepetteki ürün sıfırlanıyorsa ürün sepetten silinmeli
+                await _unitOfWork.OrderDal.UpdateAsync(updatedOrder);
+
+                if (request.Quantity == 0) //Sepetteki ürün sıfırlanıyorsa ürün sepetten silinmeli
                 {
                     OrderDetail deletedOrderDetail = await _unitOfWork.OrderDetailDal.DeleteAsync(orderDetail);
+
+                    await _unitOfWork.OrderDal.UpdateAsync(updatedOrder);
+
                     //Sıfırlanan ürünün son hali gösterilir
                     UpdatedOrderDetailForCustomerDto deleteOrderDetailForCustomerDto = _mapper.Map<UpdatedOrderDetailForCustomerDto>(deletedOrderDetail);
 
@@ -57,6 +64,9 @@ namespace Business.Features.OrderDetails.Commands.UpdateOrderDetailForCustomer
                 orderDetail.Quantity = request.Quantity + orderDetail.Quantity;
                 orderDetail.TotalPrice = product.Price * orderDetail.Quantity;
                 orderDetail.Id = request.Id;
+
+                updatedOrder.OrderAmount += (product.Price * request.Quantity);
+                await _unitOfWork.OrderDal.UpdateAsync(updatedOrder);
 
                 OrderDetail updatedOrderDetail = await _unitOfWork.OrderDetailDal.UpdateAsync(orderDetail);
                 UpdatedOrderDetailForCustomerDto updateOrderDetailDto = _mapper.Map<UpdatedOrderDetailForCustomerDto>(updatedOrderDetail);

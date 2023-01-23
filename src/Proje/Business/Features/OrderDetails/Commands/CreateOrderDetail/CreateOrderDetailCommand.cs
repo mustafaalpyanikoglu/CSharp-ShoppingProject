@@ -53,7 +53,11 @@ namespace Business.Features.OrderDetails.Commands.CreateOrder
                     updatedOrderDetail.TotalPrice = updatedOrderDetail.Quantity * product.Price;
                     OrderDetail mappedUpdatedOrderDetail = await _unitOfWork.OrderDetailDal.UpdateAsync(updatedOrderDetail);
                     CreatedOrderDetailDto createdOrderDetailDto = _mapper.Map<CreatedOrderDetailDto>(mappedUpdatedOrderDetail);
-                    
+
+                    Order? order = await _unitOfWork.OrderDal.GetAsync(o => o.Id == request.OrderId);
+                    order.OrderAmount = order.OrderAmount + (product.Price * request.Quantity);
+                    await _unitOfWork.OrderDal.UpdateAsync(order);
+
                     await _unitOfWork.SaveChangesAsync();
                     
                     return createdOrderDetailDto;
@@ -63,6 +67,10 @@ namespace Business.Features.OrderDetails.Commands.CreateOrder
 
                 OrderDetail createdOrderDetail = await _unitOfWork.OrderDetailDal.AddAsync(mappedOrderDetail);
                 CreatedOrderDetailDto createOrderDetailDto = _mapper.Map<CreatedOrderDetailDto>(createdOrderDetail);
+
+                Order? updatedOrder = await _unitOfWork.OrderDal.GetAsync(o => o.Id == request.OrderId);
+                updatedOrder.OrderAmount = updatedOrder.OrderAmount + (product.Price * request.Quantity);
+                await _unitOfWork.OrderDal.UpdateAsync(updatedOrder);
 
                 await _unitOfWork.SaveChangesAsync();
 
