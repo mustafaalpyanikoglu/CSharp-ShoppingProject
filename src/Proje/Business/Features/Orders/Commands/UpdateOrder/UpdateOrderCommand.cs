@@ -18,6 +18,7 @@ namespace Business.Features.Orders.Commands.UpdateOrder
         public int Id { get; set; }
         public int UserCartId { get; set; }
         public string OrderNumber { get; set; }
+        public float OrderAmount { get; set; }
         public bool Status { get; set; }
 
         public string[] Roles => new[] { Admin, OrderUpdate };

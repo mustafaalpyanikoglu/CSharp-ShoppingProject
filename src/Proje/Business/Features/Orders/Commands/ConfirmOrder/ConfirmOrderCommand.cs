@@ -47,17 +47,14 @@ namespace Business.Features.Orders.Commands.ConfirmOrder
 
                 UserCart? userCart = await _unitOfWork.UserCartDal.GetAsync(u => u.Id == order.UserCartId);
                 Purse? purse = await _unitOfWork.PurseDal.GetAsync(p => p.UserId == userCart.UserId);
-                
-                float totalPrice = 0;
 
                 IPaginate<OrderDetail> orderDetails = await _unitOfWork.OrderDetailDal.GetListAsync(
                     o => o.OrderId == request.OrderId,
                     include: c => c.Include(c => c.Product)
                 );
                 List<Product> products = new List<Product>();
-                foreach (var item in orderDetails.Items)  //sepetin tutarı hesaplanır
+                foreach (var item in orderDetails.Items) 
                 {
-                    totalPrice += item.TotalPrice;
                     products.Add(item.Product);
                 }
                 foreach (var item in orderDetails.Items) //stoktaki ürünlerin miktarı azaltılır
@@ -72,7 +69,7 @@ namespace Business.Features.Orders.Commands.ConfirmOrder
                 }
                 _unitOfWork.ProductDal.UpdateRange(products); //alınan ürünler toplu bir şekilde güncellenir
 
-                await _purseService.SpendMoney(purse,totalPrice);
+                await _purseService.SpendMoney(purse,order.OrderAmount);
 
                 order.Status = true;
                 order.ApprovalDate = Convert.ToDateTime(DateTime.Now.ToString("F"));
@@ -82,7 +79,6 @@ namespace Business.Features.Orders.Commands.ConfirmOrder
 
                 Order updatedOrder = await _unitOfWork.OrderDal.UpdateAsync(order); //sipariş durumu onaylanır
                 ConfirmOrderDto confirmOrderDto = _mapper.Map<ConfirmOrderDto>(updatedOrder);
-                confirmOrderDto.TotalPrice = totalPrice;
 
                 _unitOfWork.SaveChanges();
                 await _unitOfWork.SaveChangesAsync();
