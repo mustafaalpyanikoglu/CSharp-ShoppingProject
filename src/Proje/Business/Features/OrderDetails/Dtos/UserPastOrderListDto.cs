@@ -7,7 +7,8 @@
         public float ProductPrice { get; set; }
         public string OrderNumber { get; set; }
         public int Quantity { get; set; }
-        public float TotalPrice { get; set; }
+        public float ProductTotalPrice { get; set; }
+        public float OrderAmount { get; set; }
         public DateTime OrderDate { get; set; }
         public DateTime ApprovalDate { get; set; }
         public string FirstName { get; set; }
