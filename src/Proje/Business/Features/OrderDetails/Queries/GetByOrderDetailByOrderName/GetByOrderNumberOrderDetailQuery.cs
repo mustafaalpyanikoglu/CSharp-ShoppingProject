@@ -43,12 +43,7 @@ namespace Business.Features.OrderDetails.Queries.GetByOrderDetailByOrderName
             {
                 await _orderBusinessRules.OrderNumberShouldExistWhenSelected(request.OrderNumber);
 
-                OrderDetail? orderDetail = await _unitOfWork.OrderDetailDal.GetAsync(o => o.Order.OrderNumber == request.OrderNumber, include: c => c.Include(c => c.Order));
-                await _orderDetailBusinessRules.OrderDetailIdShouldExistWhenSelected(orderDetail.Id);
-
-                float totalPrice = await _orderDetailService.AmountUserCart(orderDetail.OrderId);
-
-                IPaginate<OrderDetail>? OrderDetail = await _unitOfWork.OrderDetailDal.GetListAsync(
+                IPaginate<OrderDetail>? orderDetails = await _unitOfWork.OrderDetailDal.GetListAsync(
                     m => m.Order.OrderNumber == request.OrderNumber,
                     include: c => c.Include(c => c.Product)
                                    .Include(c => c.Product.Category)
@@ -57,8 +52,10 @@ namespace Business.Features.OrderDetails.Queries.GetByOrderDetailByOrderName
                                    .Include(c => c.Order.UserCart.User),
                     index: request.PageRequest.Page,
                     size: request.PageRequest.PageSize);
-                OrderDetailListByUserCartModel orderDetailListDtoForCustomer = _mapper.Map<OrderDetailListByUserCartModel>(OrderDetail);
-                orderDetailListDtoForCustomer.AmountOfPayment = totalPrice;
+
+                await _orderDetailBusinessRules.ThereMustBeDataInList(orderDetails);
+
+                OrderDetailListByUserCartModel orderDetailListDtoForCustomer = _mapper.Map<OrderDetailListByUserCartModel>(orderDetails);
                 return orderDetailListDtoForCustomer;
             }
         }

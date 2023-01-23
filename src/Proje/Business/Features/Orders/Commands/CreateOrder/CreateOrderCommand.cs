@@ -85,8 +85,11 @@ namespace Business.Features.Orders.Commands.CreateOrder
                 else
                 {
                     OrderDetail? updatedOrderDetail = await _unitOfWork.OrderDetailDal.GetAsync(o => o.OrderId == currentOrder.Id && o.ProductId == request.ProductId);
+
                     if (updatedOrderDetail != null)
                     {
+                        await _orderDetailBusinessRules.TheNumberOfProductsOrderDetailedShouldNotBeMoreThanStock(request.ProductId, updatedOrderDetail.Quantity + request.Quantity);
+
                         updatedOrderDetail.Quantity = updatedOrderDetail.Quantity + request.Quantity;
                         updatedOrderDetail.TotalPrice = updatedOrderDetail.Quantity * product.Price;
                         await _unitOfWork.OrderDetailDal.UpdateAsync(updatedOrderDetail);
@@ -105,9 +108,9 @@ namespace Business.Features.Orders.Commands.CreateOrder
                     {
                         Id = currentOrder.Id,
                         UserCartId = request.UserCartId,
-                        OrderNumber = await _orderService.CreateOrderNumber(),
+                        OrderNumber = currentOrder.OrderNumber ?? await _orderService.CreateOrderNumber(),
                         OrderDate = Convert.ToDateTime(DateTime.Now.ToString("F")),
-                        OrderAmount = await _orderDetailService.AmountUserCart(currentOrder.Id) + updatedOrderDetail.TotalPrice,
+                        OrderAmount = currentOrder.OrderAmount + (product.Price * request.Quantity),
                         Status = false,
                     });
                     await _unitOfWork.SaveChangesAsync();

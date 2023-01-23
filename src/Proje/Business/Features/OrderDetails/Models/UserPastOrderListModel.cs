@@ -6,6 +6,5 @@ namespace Business.Features.OrderDetails.Models
     public class UserPastOrderListModel : BasePageableModel
     {
         public IList<UserPastOrderListDto> Items { get; set; }
-        public float AmountOfPayment { get; set; }
     }
 }

@@ -6,6 +6,5 @@ namespace Business.Features.OrderDetails.Models
     public class OrderDetailListByUserCartModel : BasePageableModel
     {
         public IList<OrderDetailListDtoForCustomer> Items { get; set; }
-        public float AmountOfPayment { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using Core.Utilities.Abstract;
 using Core.Utilities.Concrete;
 using Entities.Concrete;
 using DataAccess.Concrete.EfUnitOfWork;
+using Core.Persistence.Paging;
 
 namespace Business.Features.OrderDetails.Rules
 {
@@ -27,6 +28,13 @@ namespace Business.Features.OrderDetails.Rules
             if (orderDetail == null) throw new BusinessException(OrderDetailNotFound);
             return Task.CompletedTask;
         }
+
+        public Task ThereMustBeDataInList(IPaginate<OrderDetail> orderDetails)
+        {
+            if (orderDetails.Count == 0) throw new BusinessException(OrderDetailNotFound);
+            return Task.CompletedTask;
+        }
+
         public async Task ThereShouldBeNoItemsInTheCart(int orderId)
         {
             OrderDetail? result = await _unitOfWork.OrderDetailDal.GetAsync(b => b.OrderId == orderId);

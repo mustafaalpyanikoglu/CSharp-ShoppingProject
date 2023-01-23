@@ -47,12 +47,6 @@ namespace Business.Features.OrderDetailDetails.Queries.GetListPastOrderDetailDet
             {
                 await _userBusinessRules.UserIdMustBeAvailable(request.UserId);
 
-                OrderDetail? orderDetail = await _unitOfWork.OrderDetailDal.GetAsync(o => o.Order.UserCart.UserId == request.UserId, include: c => c.Include(c => c.Order));
-                if(orderDetail == null) throw new BusinessException(OrderMessages.PreviousOrderNotAvailable);
-                await _orderDetailBusinessRules.OrderDetailIdShouldExistWhenSelected(orderDetail.Id);
-
-                float totalPrice = await _orderDetailService.AmountUserCart(orderDetail.OrderId);
-
                 IPaginate<OrderDetail> OrderDetails = await _unitOfWork.OrderDetailDal.GetListAsync(
                     o => o.Order.Status == true && o.Order.UserCart.User.Id == request.UserId,
                     include: c => c.Include(c => c.Product)
@@ -63,7 +57,6 @@ namespace Business.Features.OrderDetailDetails.Queries.GetListPastOrderDetailDet
                     index: request.PageRequest.Page,
                     size: request.PageRequest.PageSize);
                 UserPastOrderListModel mappedGetListOrderDetailByUserCartDto = _mapper.Map<UserPastOrderListModel>(OrderDetails);
-                mappedGetListOrderDetailByUserCartDto.AmountOfPayment = totalPrice;
                 return mappedGetListOrderDetailByUserCartDto;
             }
         }
