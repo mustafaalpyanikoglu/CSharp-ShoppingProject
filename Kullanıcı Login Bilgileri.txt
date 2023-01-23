@@ -1,0 +1,7 @@
+Admin Hesap
+email: admin@gmail.com
+şifre: 1
+
+Müşteri Hesap
+email: malpyanikoglu@gmail.com
+şifre: 123
