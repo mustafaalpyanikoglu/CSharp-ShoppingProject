@@ -17,7 +17,7 @@ namespace Business.Features.Purses.Commands.DeletePurse
         public int UserId { get; set; }
         public float Money { get; set; }
 
-        public string[] Roles => new[] { Admin };
+        public string[] Roles => new[] { Admin,Customer };
 
         public class UpdatePurseCommandHandler : IRequestHandler<UpdatePurseCommand, UpdatedPurseDto>
         {
